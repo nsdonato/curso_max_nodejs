@@ -1433,7 +1433,8 @@
     150 - Defining a Model
         
         Elimina todo lo que hay en models>produt
-
+            importar sequelize
+            importo mi db desde utils
 
     151 - Syncing JS Definitions to the Database
     152 - Inserting Data & Creating a Product
