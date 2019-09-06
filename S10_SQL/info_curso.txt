@@ -1660,7 +1660,7 @@
         
         // Comenta esto una vez que hizo las relaciones.
         sequelize.sync({ force: true })
-
+    
     162 - Using Magic Association Methods
     163 - Fetching Related Products
     164 - One-To-Many & Many-To-Many Relations
