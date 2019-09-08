@@ -1119,7 +1119,7 @@
 
     118 - Loading Product Detail Data
 
-        Crear una función estatica findById(id,cb), que obtiene la info del archivo y busca el id en particular que se le pasa por parametro.
+        Crear una función estatica findByPk(id,cb), que obtiene la info del archivo y busca el id en particular que se le pasa por parametro.
         recorriendo los productos.
             products.find(p => { pd.id == id });
     
@@ -1278,8 +1278,9 @@
 
     137 - Setting Up MySQL
 
+        https://dev.mysql.com/downloads/file/?id=488054
         Instalar eligiendo solo MySQL Server y MySQL Workbench
-        Elegir legacy password: gia..
+        Elegir legacy password: mysqlGia09
         Chequear para que arranque una vez que se termine de instalar.
         Clic en la instancia local > 
             poner el pass -> 
@@ -1426,7 +1427,12 @@
 
             const Sequelize = require('sequelize');
 
-            const sequelize = new Sequelize('node-complete','root','$gia.69$', {dialect: 'mysql', host: 'localhost'});
+            const sequelize = new Sequelize('node-complete','root','mysqlGia09', { 
+                dialect: 'mysql', host: 'localhost'
+            });
+
+            module.export = sequelize;
+            
 
             * host no es necesario ponerlo cuando es localhost, pero se puede poner igual.
         
@@ -1435,20 +1441,288 @@
         Elimina todo lo que hay en models>produt
             importar sequelize
             importo mi db desde utils
+            genero un modelo para Product, obtengo las configuraicones de sequelize y defino un modelo.
+
+            const Sequelize = require('sequelize');
+
+            const sequelize = new Sequelize('../util/database')
+
+            const Product = sequelize.define('product', {
+                id: {
+                    type: Sequelize.INTEGER,
+                    autoIncrement: true,
+                    allowNulls: false,
+                    primaryKey: true
+                },
+                title: Sequelize.STRING  // lo deja asi nomas solo porque e sun ejemplo.
+                price: {
+                    type: Sequelize.DOUBLE,
+                    allowNulls: false
+                },
+                imageUrl: {
+                    type: Sequelize.STRING,
+                    allowNulls: false
+                },
+                description: {
+                    type: Sequelize.STRING,
+                    allowNulls: false
+                }
+            });
+
+            module.exports = Products;
 
     151 - Syncing JS Definitions to the Database
+
+        en app.js me ocupo de decirle a sequelize que mis modelos se conviertan en tablas o de obtener tablas  que pertenencen a otras al iniciar la app.
+
+        Hace todo esto sin sobreescribirlas. 
+        Mira todos los modelos que creamos, y crea las tablas en las bases y sus relaciones.
+
+        sequelize.sync().then(result => {
+            app.listen(3000);
+            console.log(result);
+        })
+        .catch(err => {
+            console.log(err);
+        })
+    
     152 - Inserting Data & Creating a Product
-    153 - MUST READ: findById() in Sequelize 5
+        admin.js
+
+        exports.postAddProduct = (req, res, next) => {
+        const title = req.body.title;
+        const imageUrl = req.body.imageUrl;
+        const price = req.body.price;
+        const description = req.body.description;
+            Product.create({
+                title: title,
+                price: price,
+                imageUrl: imageUrl,
+                description: description
+            })
+            .then(result => {
+                console.log("CREATED PRODUCT");
+                res.redirect('/admin/products');
+            })
+            .catch(err => {
+                console.log(err);
+            })
+        };
+
+    153 - MUST READ: findByPk() in Sequelize 5
+
+        MUST READ: findByPk() in Sequelize 5
+        One quick note:
+            With Sequelize v5, findByPk() (which we'll use in this course) was replaced by findByPk().
+            You use it in the same way, so you can simply replace all occurrences of findByPk() with findByPk()
+
     154 - Retrieving Data & Finding Products
+        shop.js
+
+        Product.findAll() // Se puede poner parametros ({ where: }), buscar mas en la docu.
+        exports.getIndex = (req, res, next) => {
+        Product.findAll()
+            .then(products => {
+                res.render('shop/index', {
+                prods: products,
+                pageTitle: 'Shop',
+                path: '/'
+                });
+            })
+            .catch(err =>{
+                console.log(err);
+            });
+        };
+
+        exports.getProducts = (req, res, next) => {
+        Product.findAll()
+            .then(products => {
+            res.render('shop/product-list', {
+                prods: products,
+                pageTitle: 'All Products',
+                path: '/products'
+            });
+            })
+            .catch(err => console.log(err));
+        };
+
     155 - Getting a Single Product with the "where" Condition
+
+        Obtengo un solo producto, no un array, así que hay que cambiar findByPk and product
+        1) manera:
+            Product.findByPk(prodId)
+            .then((product) => {
+            res.render('shop/product-detail', {
+                product: product,
+                pageTitle: product.title,
+                path: '/products'
+            });
+            })
+            .catch(err => console.log(err));
+
+        2) manera (where):
+             Product.findAll({ where: {id: prodId}})
+            const prodId = req.params.productId;
+            .then((products) => {
+                res.render('shop/product-detail', {
+                    product: products[0],
+                    pageTitle: products[0].title,
+                    path: '/products'
+                });
+            })
+            .catch(err => console.log(err));
+
     156 - Fetching Admin Products
+
+        exports.getProducts = (req, res, next) => {
+        Product.findAll()
+            .then(products => {
+                res.render('admin/products', {
+                prods: products,
+                pageTitle: 'Admin Products',
+                path: '/admin/products'
+                });
+            })
+        };
+
     157 - Updating Products
+
+        exports.postEditProduct = (req, res, next) => {
+            const prodId = req.body.productId;
+            const updatedTitle = req.body.title;
+            const updatedPrice = req.body.price;
+            const updatedImageUrl = req.body.imageUrl;
+            const updatedDesc = req.body.description;
+            Product.findByPk(prodId)
+                .then(product => {
+                product.title = updatedTitle;
+                product.price = updatedPrice;
+                product.imageUrl = updatedImageUrl;
+                product.description = updatedDesc;
+                return product.save();
+                })
+                .then(result => {
+                console.log('UPDATED PRODUCT');
+                })
+                .catch(err => { console.log(err) });
+            res.redirect('/admin/products');
+        };
+
     158 - Deleting Products
+
+        exports.postDeleteProduct = (req, res, next) => {
+            const prodId = req.body.productId;
+            Product.findByPk(prodId)
+            .then(product => {
+                return product.destroy();
+            })
+            .then(result => {
+                console.log("DESTROYED PRODUCT");
+                res.redirect('/admin/products');
+            })
+            .catch(err => { console.log(err)});
+        };
     159 - Creating a User Model
+
+        const Sequelize = require('sequelize');
+        const sequelize = require('../util/database');
+        const User = sequelize.define('user', {
+            id: {
+                type: Sequelize.INTEGER,
+                autoIncrement: true,
+                allowNull: false,
+                primaryKey: true
+            },
+            name: Sequelize.STRING,
+            email: Sequelize.STRING
+        });
+
+        module.exports = User;
+
     160 - Adding a One-To-Many Relationship
+
+        Product    <-*.1-    User
+            *.* -> Cart  <- 1
+            *.* -> Order <- 1
+
+        app.js 
+            const Product = require('./models/product');
+            const User = require('./models/user');
+            
+            // Define las relaciones en la bd.
+            Product.belongsTo(User, {constraints: true, onDelete: 'CASCADE' }); // 2 param es opcional
+            User.hasMany(Product);
+
+            // SOLO PARA DEV, NUNCA PROD!! Se elimina todo y se vuelve a crear para generar las relaciones de manera correcta.
+            sequelize.sync({ force: true })
+
     161 - Creating & Managing a Dummy User
+        
+        // sequelize.sync({ force: true }), lo vuelve atras, una vez que hizo las relaciones.
+       sequelize
+        .sync()
+        .then(result => {
+            return User.findByPk(1)
+        })
+        .then(user => {
+            if(!user){
+                return User.create({name: 'Noelia', email: 'test@test.com' });
+            }
+            return user;
+        })
+        .then(user => {
+            console.log(user);
+            app.listen(3000);
+        })
+        .catch(err => {
+            console.log(err);
+        });
+
+        //Creamos un middleare
+        app.use((req,res,next) => {
+            User.findByPk(1)
+            .then(user => {
+                req.user = user;
+            })
+            .catch(err => {console.log(err)});
+        });
+    
     162 - Using Magic Association Methods
+
+    // podemos agregar el usuario acá:
+        
+        exports.postAddProduct = (req, res, next) => {
+        const title = req.body.title;
+        const imageUrl = req.body.imageUrl;
+        const price = req.body.price;
+        const description = req.body.description;
+        Product.create({
+            title: title,
+            price: price,
+            imageUrl: imageUrl,
+            description: description
+            userId: req.user.id
+        })
+
+    // Hay otra manera:
+         req.user
+            .createProduct({
+                title: title,
+                price: price,
+                imageUrl: imageUrl,
+                description: description
+            })
+            .then(result => {
+                console.log("CREATED PRODUCT");
+                res.redirect('/admin/products');
+            })
+            .catch(err => {
+                console.log(err);
+        }))
+
     163 - Fetching Related Products
+        
+        
     164 - One-To-Many & Many-To-Many Relations
     165 - Creating & Fetching a Cart
     166 - Adding New Products to the Cart
@@ -1862,8 +2136,6 @@
     Course Roundup
     Course Slides
     Bonus: More Content!
-
-
 
 -------------------- IDEAS BELGA ---------------------------------
 
