@@ -2114,39 +2114,278 @@
 
 # Working with NoSQL & Using MongoDB
 
-    Module Introduction
-    What is MongoDB?
-    Relations in NoSQL
-    Setting Up MongoDB
-    Installing the MongoDB Driver
-    Creating the Database Connection
-    Finishing the Database Connection
-    Using the Database Connection
-    Creating Products
-    Understanding the MongoDB Compass
-    Fetching All Products
-    Fetching a Single Product
-    Making the "Edit" & "Delete" Buttons Work Again
-    Working on the Product Model to Edit our Product
-    Finishing the "Update Product" Code
-    One Note About Updating Products
-    Deleting Products
-    Fixing the "Add Product" Functionality
-    Creating New Users
-    Storing the User in our Database
-    Working on Cart Items & Orders
-    Adding the "Add to Cart" Functionality
-    Storing Multiple Products in the Cart
-    Displaying the Cart Items
-    Fixing a Bug
-    Deleting Cart Items
-    Adding an Order
-    Adding Relational Order Data
-    Getting Orders
-    Removing Deleted Items From the Cart
-    Wrap Up
-    Useful Resources & Links
-    Two Adjustments (behind the scenes)
+    174 - Module Introduction
+        bla bla NoSQL Databases / MongoDB.
+
+    175 - What is MongoDB?
+        Es una introducción esto, si queres aprender mas, el tiene un curso exclusivo de mongodb.
+
+        Mongo viene de "enorme", por humongous.
+        Esta creado para crear aplicaciones de alta escala, donde se necesita buscar información de manera rapida,mismo al guardarla, actualizarla, etc.
+
+        Puede tener multiple base de datos, que a su vez tiene colecciones, que a su vez tiene, documentos.
+
+        No es necesario tener el mismo esquema en todos los documentos.
+
+        MongoDB usa JSON, para guardar info en las collections. (bson -binary json-, transforma por atras antes de guardarlo en archivos)
+
+        Los documentos adentro de documentos son documentos "embebidos".
+
+    176 - Relations in NoSQL
+        Para que funcione de manera rapida no es que existen relaciones y si tengo que buscar las ordenes del usuario, después tengo que buscar la información del usuario.
+
+        Acá tendríamos dentro de la colección Orders, datos del usuario embebido, por ende nos ahorramos una llamada por ende, es mucho mas rapido.
+
+        Tipos de relaciones:
+            - Nested/Embedded documentos
+                Un documento metido en otro.
+            - Referencias
+                mediante el id de los documentos.
+
+    177 - Setting Up MongoDB
+        
+        Usamos Atlas, que es mongo en la nube. Si bien se puede bajar e instalar local, el usa esto en el curso.
+
+        Si bien lo ideal es elegir un cluster cerca de tu localización, hay que elegir uno que sea gratis. 
+
+        Te hace elegir por "default":
+            - N. Virginia
+            - Cluster tier: MO (el gratis)
+            - Dejar todo como esta. (amazon, etc)
+        
+        Crear un usuario - Security > Database Access:
+            User: admin_mongo
+            Pass autogenerada: ywGX4vucwQksRGIb
+
+        Agregar mi ip a la whitelist:
+            186.139.114.102
+        
+        Elegir connect:
+            Elegir connect with your application
+            Elegir el driver de mongo db que vamos a instalar para poder conectarnos localmente.
+            
+    178 - Installing the MongoDB Driver
+
+        Instalar el driver: 
+            npm install --save mongodb
+        
+        Borra todo lo relacionado a mysql en app.js
+
+        util.js
+            const mongodb = require('mongodb');
+            const MongoClient = mongodb.MongoClient;
+
+            const mongoConnect = (cb) => {
+                MongoClient.connect('mongodb+srv://admin_mongo:ywGX4vucwQksRGIb@cursomax-xoskd.mongodb.net/test?retryWrites=true&w=majority')
+                .then(client => {
+                    console.log("Conectado");
+                    callback(client)
+                })
+                .catch(err => {console.log(err)});
+            }
+            
+            module.export = mongoConnect;
+
+            app.js 
+                const mongoConnect = require('./util/database')
+            
+                // Abajo de todo:
+                mongoConnect((client) =>{
+                    app.listen(3000);
+                    console.log(client);
+                })
+
+            *No olvidarse cambiar el password, revisar de tener bien el usuario que creamos.
+
+            * Comenta las rutas en app.js momentaneamente porque todavía apuntan a mysql.
+
+    179 - Creating the Database Connection
+            Agrega otra vez, para probar tdo lo de admin, cambia en models, lo de producto (mysql) por mongodb.
+
+            const mongoConnect = require('../util/database');
+
+            class Product {
+            constructor(title, price, description, imageUrl) {
+                this.title = title;
+                this.price = price;
+                this.description = description;
+                this.imageUrl = imageUrl;
+            }
+
+            save() {
+            }
+            }
+
+            const Product = sequelize.define('product', {
+            id: {
+                type: Sequelize.INTEGER,
+                autoIncrement: true,
+                allowNull: false,
+                primaryKey: true
+            },
+            title: Sequelize.STRING,
+            price: {
+                type: Sequelize.DOUBLE,
+                allowNull: false
+            },
+            imageUrl: {
+                type: Sequelize.STRING,
+                allowNull: false
+            },
+            description: {
+                type: Sequelize.STRING,
+                allowNull: false
+            }
+            });
+
+            module.exports = Product;
+
+    180 - Finishing the Database Connection
+        Para conectarse a una base de datos especifica, en el connection string solamente hay que ponerle la base que necesitamos.
+
+        database.js
+            const mongodb = require("mongodb");
+            const MongoClient = mongodb.MongoClient;
+
+            let _db;
+
+            const mongoConnect = (callback) => {
+            MongoClient.connect(
+                "mongodb+srv://admin_mongo:ywGX4vucwQksRGIb@cursomax-xoskd.mongodb.net/test?retryWrites=true&w=majority"
+            )
+                .then(client => {
+                console.log("Conectado");
+                _db = client.db();
+                callback();
+                })
+                .catch(err => {
+                console.log(err);
+                throw err;
+                });
+            };
+
+            const getDb = () => {
+            if(_db){
+                return _db;
+            }
+            
+            throw "No database found";
+            };
+
+            module.exports = mongoConnect;
+            module.getDb = getDb;
+
+
+            * Es un patron que se utiliza, para que mongodb se maneje de manera eficiente con pooling, al igual que mysql/sql.
+
+            product.js
+                //cambia solo eso.
+                const getDb = require('../util/database').getDb;
+
+    181 - Using the Database Connection
+        Si bien podemos ver la docu en la página...
+
+        products.js
+          const getDb = require('../util/database').getDb;
+
+            class Product {
+            constructor(title, price, description, imageUrl) {
+                this.title = title;
+                this.price = price;
+                this.description = description;
+                this.imageUrl = imageUrl;
+            }
+
+            save() {
+                const db = getDb();
+                db.collection('products')
+                .insertOne(this)
+                .then(result => {
+                console.log(result);
+                })
+                .catch(err => {
+                console.log(err);
+                })
+            }
+            }
+
+            module.exports = Product;
+            
+    182 - Creating Products
+
+        Empieza a actualizar los modelos con lo de mongodb.
+
+        admin.js
+             const product = new Product(title, price, description, imageUrl);
+            product
+            .save()
+            .then(result => {
+
+        models.product.js
+            // agrega el return a db 
+
+            save() {
+            const db = getDb();
+            return db
+            .collection('products')
+
+    183 - Understanding the MongoDB Compass
+    184 - Fetching All Products
+    185 - Fetching a Single Product
+    186 - Making the "Edit" & "Delete" Buttons Work Again
+    187 - Working on the Product Model to Edit our Product
+    188 - Finishing the "Update Product" Code
+    189 - One Note About Updating Products
+    190 - Deleting Products
+    191 - Fixing the "Add Product" Functionality
+    192 - Creating New Users
+    193 - Storing the User in our Database
+    194 - Working on Cart Items & Orders
+    195 - Adding the "Add to Cart" Functionality
+    196 - Storing Multiple Products in the Cart
+    197 - Displaying the Cart Items
+    198 - Fixing a Bug
+    199 - Deleting Cart Items
+    200 - Adding an Order
+    201 - Adding Relational Order Data
+    202 - Getting Orders
+    203 - Removing Deleted Items From the Cart
+    204 - Wrap Up
+        Resumen de todo..
+    205 - Useful Resources & Links
+        Useful Resources & Links
+        Attached, you find the source code for this section.
+
+        When using my source code, make sure to run npm install in the extracted folder!
+
+        Useful resource:
+
+        MongoDB Official Docs: https://docs.mongodb.com/manual/core/security-encryption-at-rest/https://docs.mongodb.com/manual/
+
+        SQL vs NoSQL: https://academind.com/learn/web-dev/sql-vs-nosql/
+
+        Learn more about MongoDB: https://academind.com/learn/mongodb
+
+        Recursos de esta clase
+        00-starting-setup.zip
+        01-using-the-database-connection.zip
+        02-fetching-all-products.zip
+        03-fetch-a-single-product.zip
+        04-finishing-the-update-product-code.zip
+        05-deleting-products.zip
+        06-fixing-the-add-product-functionality.zip
+        07-storing-the-user-in-the-database.zip
+        08-added-the-add-to-cart-functionality.zip
+        09-displaying-the-cart-items.zip
+        10-deleting-cart-items.zip
+        11-adding-relational-order-data.zip
+        12-removing-deleted-items-from-the-cart.zip
+
+    206 - Two Adjustments (behind the scenes)
+        Behind the scenes, two files were deleted:
+        order-item.js
+        order.js
+        Why? We simply don't need them anymore, the way we now structured our models.
 
 ------------------------------------------------------------------
 
@@ -2178,28 +2417,45 @@
 
 # Sessions & Cookies
 
-    Module Introduction
-    What is a Cookie?
-    The Current Project Status
-    Optional: Creating the Login Form
-    Adding the Request Driven Login Solution
-    Setting a Cookie
-    Manipulating Cookies
-    Configuring Cookies
-    What is a Session?
-    Initializing the Session Middleware
-    Using the Session Middleware
-    Using MongoDB to Store Sessions
-    Sessions & Cookies - A Short Summary
-    Time to Practice - Sessions and Cookies 
-    1 pregunta
-    Deleting a Cookie
-    Fixing Some Minor Bugs
-    Making "Add to Cart" Work Again
-    Two Tiny Improvements
-    Wrap Up
-    Code Adjustments
-    Useful Resources & Links
+    228 - Module Introduction
+        bla bla, cookies..
+
+    229 - What is a Cookie?
+        
+        Por ejemplo, cuando el usuario se quiere loguear, guardamos cierta información del login, para que la proxima vez que haga un request, nosotros tengamos la información de que el usuario esta autenticado.
+
+        Para eso, desde node, podemos enviar una cookie por header.
+
+        Las cookies se guardan del lado del cliente.
+
+    230 - The Current Project Status
+
+        // A el, el proyecto le con Mongoose, dice que hay que bajar las cosas pero quiero fucking avanzar.
+
+    231 - Optional: Creating the Login Form
+        
+        - en routes, genera auth.js
+        - importa en app.js el modulo.
+        - genera el controlador auth.js
+
+    232 - Adding the Request Driven Login Solution
+    233 - Setting a Cookie
+    234 - Manipulating Cookies
+    235 - Configuring Cookies
+    236 - What is a Session?
+    237 - Initializing the Session Middleware
+    238 - Using the Session Middleware
+    239 - Using MongoDB to Store Sessions
+    240 - Sessions & Cookies - A Short Summary
+    241 - Time to Practice - Sessions and Cookies 
+    242 - 1 pregunta
+    243 - Deleting a Cookie
+    244 - Fixing Some Minor Bugs
+    245 - Making "Add to Cart" Work Again
+    246 - Two Tiny Improvements
+    247 - Wrap Up
+    248 - Code Adjustments
+    249 - Useful Resources & Links
 
 ------------------------------------------------------------------
 
@@ -2338,24 +2594,136 @@
 
 # Understanding Async Requests
 
-    Module Introduction
-    What are Async Requests?
-    Adding Client Side JS Code
-    The JSON Data Format
-    Sending & Handling Background Requests
-    Manipulating the DOM
-    Useful Resources & Links
+    344 - Module Introduction
+    345 - What are Async Requests?
 
+    Cliente ->  Request (Data (JSON))              ->  Server
+            <-  Response(html page) (Data(JSON))   <-
+        
+    346 - Adding Client Side JS Code
+
+        public/js/admin.js
+            // Código que corre en el cliente.
+            const deleteProduct = (btn) => {
+                const productId = btn.parentNode.querySelector('name=productId').value;
+                const cstk = btn.parentNode.querySelector('name=_cstk').value;
+            };
+
+        views/admin/products.ejs
+            <script src="/js/admin.js"></script>
+            Cambia el submit por un type button, también le agrega:
+            onClick="deteleProduct(this)"
+
+    347 - The JSON Data Format
+        What is JSON?
+
+        JSON stands for JavaScript Object Notation and a typically JSON data structure looks like this:
+
+        {
+            "name": "Your Name",
+            "age": 29,
+            "courses": [
+                "angular-the-complete-guide",
+                "react-the-complete-guide"
+            ],
+            "profile": {
+                "joined": "2017-05-21",
+                "courses": 2
+            },
+            "averageRating": 4.8,
+            "active": true
+        }
+        It looks a lot like a normal JavaScript object, but one important difference is that all key names are enclosed by double quotation marks (").
+
+        Besides that, you can store text (string), numeric (integers and floats) and boolean data as well as nested objects and arrays.
+
+        You can dive deeper on this page: https://www.json.org/
+
+    348 - Sending & Handling Background Requests
+
+        routes/admin.js
+            router.delete('/product/:productId', isAuth, adminController.deleteProduct);
+            
+        controller/admin.js
+            modifica el nombre de la función.
+            obtengo los valores del request:
+                req.params.productId
+                no redirigimos mas a /admin/products.
+                res.status(200).json({message: 'Success' })
+                en el catch retornamos 500 y json.
+                res.status(500).json({message: 'Delete error' })
+        
+        public/js/admin.js
+            // Código que corre en el cliente.
+            const deleteProduct = (btn) => {
+                const productId = btn.parentNode.querySelector('name=productId').value;
+                const cstk = btn.parentNode.querySelector('name=_cstk').value;
+
+                fetch('/admin/product/' + prodId, {
+                    method: 'DELETE',
+                    headers: {
+                        'csrf-token': csrf
+                    }
+                })
+                .then(result => {
+                    console.log(result);
+                })
+                .catch(err => {
+                    console.log(err)
+                });
+            };
+
+
+    349 - Manipulating the DOM
+
+
+    350 - Useful Resources & Links
+        Useful Resources & Links
+        Attached, you find the source code for this section.
+
+        When using my source code, make sure to run npm install in the extracted folder!
+
+        Useful resources:
+
+        More on the fetch API: https://developers.google.com/web/updates/2015/03/introduction-to-fetch
+
+        More on AJAX Requests: https://developer.mozilla.org/en-US/docs/Web/Guide/AJAX/Getting_Started
+
+        Recursos de esta clase
+        01-adding-client-side-code.zip
+        02-manipulating-the-dom.zip
 ------------------------------------------------------------------
 
 # Adding Payments
 
-    Module Introduction
-    How Payments Work
-    Adding a Checkout Page
-    Using Stripe in Your App
-    Useful Resources & Links
+    351 - Module Introduction
+        Bla bla, usar una api de un vendor que se llama Stripe.
 
+    352 - How Payments Work
+        Como funciona Stripe, basicamente le mandas los datos de la tarjeta, si valida ok, te generan un Token
+        y eso después lo tenes que mandar al confirmar la compra.
+
+    353 - Adding a Checkout Page
+        Agrega una ruta de checkout, modelo, vista etc.
+
+    354 - Using Stripe in Your App
+        Crear una cuenta en Stripe.
+        Copiar y pegar la información de la pagina (el formulario)
+        * No lo termine de ver, nunca vamos a usar esto.
+
+    355 - Useful Resources & Links
+        Useful Resources & Links
+        Attached, you find the source code for this section.
+
+        When using my source code, make sure to run npm install in the extracted folder!
+
+        Useful resources:
+
+        Official Stripe.js Docs: https://stripe.com/docs
+
+        Recursos de esta clase
+        01-added-checkout-page.zip
+        02-using-stripe.zip
 ------------------------------------------------------------------
 
 # Working with REST APIs - The Basics

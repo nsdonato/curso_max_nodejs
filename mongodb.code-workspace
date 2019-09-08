@@ -1,0 +1,25 @@
+{
+	"folders": [
+		{
+			"path": "MongoDB_Mongoose\\controllers"
+		},
+		{
+			"path": "MongoDB_Mongoose\\data"
+		},
+		{
+			"path": "MongoDB_Mongoose\\models"
+		},
+		{
+			"path": "MongoDB_Mongoose\\public"
+		},
+		{
+			"path": "MongoDB_Mongoose\\routes"
+		},
+		{
+			"path": "MongoDB_Mongoose\\util"
+		},
+		{
+			"path": "MongoDB_Mongoose\\views"
+		}
+	]
+}
