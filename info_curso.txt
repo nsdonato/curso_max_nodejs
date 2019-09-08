@@ -1280,7 +1280,7 @@
 
         https://dev.mysql.com/downloads/file/?id=488054
         Instalar eligiendo solo MySQL Server y MySQL Workbench
-        Elegir legacy password: mysqlGia09
+        Elegir legacy password: mysqlGia09 en la del trabajo, en mi pc es $gia.69$
         Chequear para que arranque una vez que se termine de instalar.
         Clic en la instancia local > 
             poner el pass -> 
@@ -1722,18 +1722,394 @@
 
     163 - Fetching Related Products
         
-        
-    164 - One-To-Many & Many-To-Many Relations
-    165 - Creating & Fetching a Cart
-    166 - Adding New Products to the Cart
-    167 - Adding Existing Products & Retrieving Cart Items
-    168 - Deleting Related Items & Deleting Cart Products
-    169 - Adding an Order Model
-    170 - Storing Cartitems as Orderitems
-    171 - Resetting the Cart & Fetching and Outputting Orders
-    172 - Wrap Up
-    173 - Useful Resources & Links
+        admin.js
+            getEditPro..
 
+              const prodId = req.params.productId;
+                req.user
+                    .getProducts({ where: { id: prodId } })
+                    .then(products => {
+                    const product = products[0];
+                if (!product) {
+                    return res.redirect('/');
+                }
+
+
+        exports.getProducts = (req, res, next) => {
+        req.user
+        .getProducts()
+        .then(products => {
+
+    164 - One-To-Many & Many-To-Many Relations
+
+        deleteo todo lo de cart.
+        models/cart.js
+            const Sequelize = require('sequelize');
+
+            const sequelize = require('../util/database');
+
+            const Cart = sequelize.define('cart', {
+            id: {
+                type: Sequelize.INTEGER,
+                autoIncrement: true,
+                allowNull: false,
+                primaryKey: true
+            },
+            quantity: Sequelize.INTEGER
+            });
+
+             module.exports = Cart;
+
+        models/cart-item.js
+            const Sequelize = require('sequelize');
+
+            const sequelize = require('../util/database');
+
+            const CartItem = sequelize.define('cartItem', {
+            id: {
+                type: Sequelize.INTEGER,
+                autoIncrement: true,
+                allowNull: false,
+                primaryKey: true
+            },
+            quantity: Sequelize.INTEGER
+            });
+
+            module.exports = CartItem;
+
+        app.js
+        const Cart = require('./model/cart');
+        const CartItem = require('./model/cart-item');
+
+        Cart.belongsTo(User);
+        Cart.belongsTo(Product, { throgh: CartItem });
+        Product.belongsToMany(Cart, { throgh: CartItem });
+
+        // Temporariamente volvemos a poner, para recrear las relaciones, SOLO DEV!
+        .sync({ force: true }) 
+
+    165 - Creating & Fetching a Cart
+
+        exports.getCart = (req, res, next) => {
+        req.user.getCart()
+        .then(cart => {
+        return cart.getProducts()
+        .then(products => {
+            res.render('shop/cart', {
+            path: '/cart',
+            pageTitle: 'Your Cart',
+            products: products
+            });
+        })
+        })
+        .catch(err => {console.log(err)});
+        // Cart.getCart(cart => {
+        //   Product.fetchAll(products => {
+        //     const cartProducts = [];
+        //     for (product of products) {
+        //       const cartProductData = cart.products.find(
+        //         prod => prod.id === product.id
+        //       );
+        //       if (cartProductData) {
+        //         cartProducts.push({ productData: product, qty: cartProductData.qty });
+        //       }
+        //     }
+        //     res.render('shop/cart', {
+        //       path: '/cart',
+        //       pageTitle: 'Your Cart',
+        //       products: cartProducts
+        //     });
+        //   });
+        // });
+        };
+
+    166 - Adding New Products to the Cart
+        
+            exports.postCart = (req, res, next) => {
+            const prodId = req.body.productId;
+            let fetchedCart;
+            req.user.getCart()
+            .then(cart => {
+                fetchedCart = cart;
+                return cart.getProducts({where: { id: prodId }});
+            })
+            .then(products => {
+                let product;
+                if(products.length > 0){
+                product = products[0];
+                }
+                let newQuantity = 1;
+                if(product){
+                
+                }
+
+                return Product.findByPk(prodId)
+                .then(product => {
+                return fetchedCart.addProduct(product, {
+                    through: { quantity: newQuantity}
+                });
+                })
+                .catch(err => {console.log(err)});
+            })
+            .then(() => {
+                res.redirect('/cart');
+            })
+            .catch(err => { console.log(err)});
+            };
+
+    167 - Adding Existing Products & Retrieving Cart Items
+
+        views/shop.ejs
+             <h1><%= p.title %></h1>
+                            <h2>Quantity: <%= p.cartItem.quantity %></h2>
+                            <form action="/cart-delete-item" method="POST">
+                                <input type="hidden" value="<%= p.id %>" name="productId">
+                                <button class="btn danger" type="submit">Delete</button>
+                            </form>
+
+
+        exports.postCart = (req, res, next) => {
+        const prodId = req.body.productId;
+        let fetchedCart;
+        let newQuantity = 1;
+
+        req.user.getCart()
+        .then(cart => {
+            fetchedCart = cart;
+            return cart.getProducts({where: { id: prodId }});
+        })
+        .then(products => {
+            let product;
+            if(products.length > 0){
+            product = products[0];
+            }
+            
+            if(product){
+            const oldQuantity = product.cartItem.quantity;
+            newQuantity = oldQuantity + 1;
+            return product;
+            }
+            return Product.findByPk(prodId)
+        })
+        .then(product => {
+            return fetchedCart.addProduct(product, {
+            through: { quantity: newQuantity }
+            });
+        })
+        .then(() => {
+            res.redirect('/cart');
+        })
+        .catch(err => { console.log(err)});
+        };
+
+
+    168 - Deleting Related Items & Deleting Cart Products
+
+        exports.postCartDeleteProduct = (req, res, next) => {
+        const prodId = req.body.productId;
+        req.user.getCart()
+        .then(cart => {
+            return cart.getProducts({ where: { id: prodId }});
+        })
+        .then(products => {
+            const product = products[0];
+            return product.cartItem.destroy();
+        })
+        .then(result => {
+            res.redirect('/cart');
+        })
+        .catch(err => { console.log(err)});
+        };
+
+    169 - Adding an Order Model
+
+        crea en models: Order (copiando y pegando cart-item)
+        crea order-item, mismo paso.
+
+        app.js
+            const Order = require('./models/order');
+            const OrderItem = require('./models/order-item');
+
+            Order.belongsTo(User);
+            User.hasMany(Order);
+            Order.belongsToMany(Product,  { through: OrderItem });    
+            
+    170 - Storing Cartitems as Orderitems
+            views/shop/cart.ejs
+
+            </ul>
+            <hr>
+            <div class="centered">
+                <form action="/create-order" method="POST">
+                    <button type="submit" class="btn">Order Now!</button>
+                </form>
+            </div>
+
+            controllers/shop.js
+               exports.postOrder = (req, res, next) => {
+                req.user.getCart()
+                .then(cart => {
+                    return cart.getProducts();
+                })
+                .then(products => {
+                    req.user.createOrder()
+                    .then(order =>  {
+                    return order.addProduct(products.map(product => {
+                        product.orderItem = { quantity: product.cartItem.quantity };
+                        return product;
+                    }));
+
+                    })
+                    .catch(err => { console.log(err); });
+                })
+                .then(result => {
+                    res.redirect('/orders');
+                })
+                .catch(err => { console.log(err); });
+                };
+
+            routes/shop.js
+                router.post('/create-order', shopController.postOrder);
+
+
+    171 - Resetting the Cart & Fetching and Outputting Orders
+
+        exports.postOrder = (req, res, next) => {
+        let fetchedCart;
+        req.user.getCart()
+        .then(cart => {
+            fetchedCart = cart;
+            return cart.getProducts();
+        })
+        .then(products => {
+            req.user.createOrder()
+            .then(order =>  {
+            return order.addProduct(products.map(product => {
+                product.orderItem = { quantity: product.cartItem.quantity };
+                return product;
+            }));
+
+            })
+            .catch(err => { console.log(err); });
+        })
+        .then(result => {
+            fetchedCart.setProducts(null);
+        })
+        .then(result => {
+            res.redirect('/orders');
+        })
+        .catch(err => { console.log(err); });
+        };
+
+        controllers.shop.js
+            exports.getOrders = (req, res, next) => {
+            req.user.getOrders()
+            .then(orders => {
+                res.render('shop/orders', {
+                path: '/orders',
+                pageTitle: 'Your Orders'
+                });
+            })
+            .catch(err => { console.log(err)});
+            };
+
+        views/shop/order.ejs
+            <%- include('../includes/head.ejs') %>
+            </head>
+
+            <body>
+                <%- include('../includes/navigation.ejs') %>
+                <main>
+                    <% if (orders.length <= 0) { %>
+                        <h1>Nothing there!</h1>
+                    <% } else { %>
+                        <ul>
+                            <% orders.forEach(order => { %>
+                                <li>
+                                    <h1># <% orders.id %> </h1>
+                                    <ul>
+                                        <% order.orderItem.forEach(item => { %>
+                                            <li><%= item.title %> (<%= item.quantity %>)  </li>
+                                        <% }); %>
+                                    </ul>
+                                </li>
+                            <% }) %>
+                        </ul>
+                    <% } %>
+                </main>
+                <%- include('../includes/end.ejs') %>
+            
+            controllers/shop.js
+                exports.getOrders = (req, res, next) => {
+                req.user.getOrders({ include: ['products']})
+
+            view/shop
+                <%- include('../includes/head.ejs') %>
+                </head>
+
+                <body>
+                    <%- include('../includes/navigation.ejs') %>
+                    <main>
+                        <% if (orders.length <= 0) { %>
+                            <h1>Nothing there!</h1>
+                        <% } else { %>
+                            <ul>
+                                <% orders.forEach(order => { %>
+                                    <li>
+                                        <h1># <% order.id %> </h1>
+                                        <ul>
+                                            <% order.products.forEach(product => { %>
+                                                <li><%= product.title %> (<%= product.orderItem.quantity %>)  </li>
+                                            <% }) %>
+                                        </ul>
+                                    </li>
+                                <% }) %>
+                            </ul>
+                        <% } %>
+                    </main>
+                    <%- include('../includes/end.ejs') %>
+
+            exports.getOrders = (req, res, next) => {
+            req.user
+            .getOrders({ include: ['products']})
+            .then(orders => {
+                res.render('shop/orders', {
+                path: '/orders',
+                pageTitle: 'Your Orders',
+                orders: orders
+                });
+            })
+            .catch(err => { console.log(err)});
+            };
+
+    172 - Wrap Up
+        Todo lo que vimos sobre sql y sequelize, comparación.
+
+    173 - Useful Resources & Links
+        Useful Resources & Links
+        Attached, you find the source code for this section.
+
+        When using my source code, make sure to run npm install in the extracted folder!
+
+        Useful resource:
+
+        Sequelize Official Docs: http://docs.sequelizejs.com/
+
+        Recursos de esta clase
+        01-defining-a-model.zip
+        02-inserting-data-and-creating-a-product.zip
+        03-getting-a-single-product.zip
+        04-updating-products.zip
+        05-deleting-products.zip
+        06-adding-a-one-to-many-relationship.zip
+        07-creating-and-managing-a-user.zip
+        08-fetching-related-products.zip
+        09-creating-and-fetching-a-cart.zip
+        10-adding-existing-products-and-retrieving.zip
+        11-deleting-related-items.zip
+        12-storing-cartitems-as-orderitems.zip
+        13-resetting-the-cart-and-fetching.zip
+        
 ------------------------------------------------------------------
 
 # Working with NoSQL & Using MongoDB
