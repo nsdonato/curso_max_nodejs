@@ -1,4 +1,4 @@
-# Introduction
+# Sección 1 - Introduction
     Introduction
     What is Node.js?
         
@@ -79,8 +79,7 @@
 
 ------------------------------------------------------------------
 
-# Optional: JavaScript - A Quick Refresher
-
+# Sección 2 - Optional: JavaScript - A Quick Refresher
     
     Module Introduction
     JavaScript in a Nutshell
@@ -99,7 +98,7 @@
 
 ------------------------------------------------------------------
 
-# Understanding the Basics
+# Sección 3 - Understanding the Basics
 
     Module Introduction
 
@@ -381,7 +380,7 @@
         Ver más (3)
 ------------------------------------------------------------------
 
-# Improved Development Workflow and Debugging
+# Sección 4 - Improved Development Workflow and Debugging
 
     Module Introduction
     Understanding NPM Scripts
@@ -528,7 +527,7 @@
 
 ------------------------------------------------------------------
 
-# Working with Express.js
+# Sección 5 - Working with Express.js
 
     Module Introduction
     What is Express.js?
@@ -744,7 +743,7 @@
 
 ------------------------------------------------------------------
 
-# Working with Dynamic Content & Adding Templating Engines
+# Sección 6 - Working with Dynamic Content & Adding Templating Engines
 
     Module Introduction
     Sharing Data Across Requests & Users
@@ -951,7 +950,7 @@
         Ver más (4)
 ------------------------------------------------------------------
 
-# The Model View Controller (MVC) - Sección 7
+# Sección 7 - The Model View Controller (MVC) - Sección 7
    
     92 - Module Introduction
     93 - What is the MVC?
@@ -1067,7 +1066,7 @@
 
 ------------------------------------------------------------------
 
-# Optional: Enhancing the App
+# Sección 8 - Optional: Enhancing the App
     Module Introduction
 
         Practicar lo que se aprendió agregando info al proyecto, es opcional este modulo.
@@ -1083,7 +1082,7 @@
 
 ------------------------------------------------------------------
 
-# Dynamic Routes & Advanced Models - Sección 9
+# Sección 9 - Dynamic Routes & Advanced Models - Sección 9
     113 - Module Introduction
     
         Aprender sobre 
@@ -1197,7 +1196,7 @@
         Ver más (7)
 ------------------------------------------------------------------
 
-# SQL Introduction
+# Sección 10 - SQL Introduction
     
     133 - Module Introduction
          
@@ -1388,7 +1387,7 @@
         04-fetching-a-single-product.zip
 ------------------------------------------------------------------
 
-# Understanding Sequelize
+# Sección 11 - Understanding Sequelize
     
     147 - Module Introduction
         bla bla Sequelize
@@ -2112,7 +2111,7 @@
         
 ------------------------------------------------------------------
 
-# Working with NoSQL & Using MongoDB
+# Sección 12 - Working with NoSQL & Using MongoDB
 
     174 - Module Introduction
         bla bla NoSQL Databases / MongoDB.
@@ -2389,7 +2388,7 @@
 
 ------------------------------------------------------------------
 
-# Working with Mongoose
+# Sección 13 - Working with Mongoose
 
     Module Introduction
     What is Mongoose?
@@ -2415,7 +2414,7 @@
 
 ------------------------------------------------------------------
 
-# Sessions & Cookies
+# Sección 14 - Sessions & Cookies
 
     228 - Module Introduction
         bla bla, cookies..
@@ -2459,7 +2458,7 @@
 
 ------------------------------------------------------------------
 
-# Adding Authentication
+# Sección 15 - Adding Authentication
 
     Module Introduction
     What is Authentication?
@@ -2484,15 +2483,52 @@
 
 ------------------------------------------------------------------
 
-# Sending Emails
+# Sección 16 - Sending Emails
 
-    Module Introduction
-    How Does Sending Emails Work?
-    Using SendGrid
-    Using Nodemailer to Send an Email
-    Potential Limitation for Large Scale Apps
-    Useful Resources & Links
+    268 - Module Introduction
+    269 - How Does Sending Emails Work?
+        
+        Hacer un servidor que envie mails desde 0 es dificil.
+        Recibir y enviar request es totalmente difernte a recibir y enviar mails, por lo que se va a utilziar un pquete de terceros.
 
+    270 - Using SendGrid
+
+        Es gratis los primeros 30 días y te deja enviar hasta 40.000 mails, después de eso podes mandar 100 por día gratis, por siempre.
+
+        Hay que crear una cuenta.
+        npm install --save nodemailer nodemailer-sendgrid-transport
+
+    271 - Using Nodemailer to Send an Email
+        
+        Hay que agregar las importaciones necesarias
+        nodemailer y nodemailer-sendgrid-transport
+
+        configurar el transporter, apikey, apiuser, se obtiene en la pagina de sendgrid.
+
+        transporter.sendMail({
+            to: email,
+            from: 'shop@node-complete.com',
+            subjects: 'Signup succeded!',
+            html: '<h1>Te logueaste correctamente</h1<'
+        })
+        .catch(err => {console.log(err)});
+
+    272 - Potential Limitation for Large Scale Apps
+        Re-veer en caso de ser necesario.
+    273 - Useful Resources & Links
+        Useful Resources & Links
+        Attached, you find the source code for this section.
+
+        When using my source code, make sure to run npm install in the extracted folder!
+
+        Useful resources:
+
+        Nodemailer Official Docs: https://nodemailer.com/about/
+
+        SendGrid Official Docs: https://sendgrid.com/docs/
+
+        Recursos de esta clase
+        01-using-nodemailer-to-send-emails.zip
 ------------------------------------------------------------------
 
 # Advanced Authentication
@@ -2675,7 +2711,32 @@
 
 
     349 - Manipulating the DOM
+    
+        public/js/admin.js
+            // Código que corre en el cliente.
+            const deleteProduct = (btn) => {
+                const productId = btn.parentNode.querySelector('name=productId').value;
+                const cstk = btn.parentNode.querySelector('name=_cstk').value;
 
+                const productElement = btn.closest('article');
+
+                fetch('/admin/product/' + prodId, {
+                    method: 'DELETE',
+                    headers: {
+                        'csrf-token': csrf
+                    }
+                })
+                .then(result => {
+                    console.log(result);
+                })
+                 .then(data => {
+                    console.log(data);
+                    productElement.parentNode.removeChild(productElement);
+                })
+                .catch(err => {
+                    console.log(err)
+                });
+            };
 
     350 - Useful Resources & Links
         Useful Resources & Links
@@ -2866,20 +2927,92 @@
 
 # Node.js as a Build Tool & Using npm
 
-    Module Introduction
-    npm & Node.js
-    Using npm
-    Versioning in package.json
-    What is a Build Tool?
-    Using Node.js in Build Processes
-    Useful Resources & Links
+    477 - Module Introduction
+        Que cosas se pueden hacer con node.
+
+    478 - npm & Node.js
+        Cuando instalamos Node, tenemos ambos.
+
+        Node.js
+            Ejecutar codigo.
+            Interactuar con archivos.
+
+        npm
+            Manejar paquetes.
+            Correr scripts.
+            
+    479 - Using npm
+        Node Package Manager (npm)
+        
+        npm cli:
+            sirve para correr diferentes comandos.
+        
+        Tenemos funcionalidad aislada,en el código de Node, ej: generar un numero random.
+        Se puede compartir internamente o externamente, o sea, se genera un package o se sube a npm Repository (para que sea publico.)
+
+        En la pagina oficial, podemos buscar packages, podemos ver todo tipo de información a cerca de cada package.
+
+        Muestra toda la info que hay en la pagina oficial, todos los comandos que tiene npm, etc..
+
+        npm install --help
+
+    480 - Versioning in package.json
+        Versioning in package.json
+        When installing a package with npm install --save or --save-dev (or --save-prod, which replaces --save), you end up with entries in your package.json file, that look something like this:
+
+        "express": "^4.16.3"
+        What does the ^ mean?
+
+        You can learn about all available version annotations/ syntaxes here: https://docs.npmjs.com/misc/semver#versions
+
+        This post on Stackoverflow provides a great summary: https://stackoverflow.com/a/25861938
+
+    481 - What is a Build Tool?
+        
+        scripts, packages que te sirven para optimizar el codigo para todos los navegadores como babel.
+        
+        npm run build x ej en una app react.
+            Si te fijas el codigo que genera en la carpeta de build, es todo codigo minificado y optimizado apra todos los navegadores.
+        
+    482 - Using Node.js in Build Processes
+        Mas info de lo mismo.
+    483 - Useful Resources & Links
+        Useful Resources & Links
+        Attached, you find the source code for this section.
+
+        When using my source code, make sure to run npm install in the extracted folder!
+
+        Useful resources:
+
+        Official npm Docs: https://docs.npmjs.com/
+
+        Learn more about Webpack (a build tool using Node.js): https://academind.com/learn/webpack
 
 ------------------------------------------------------------------
 
 # Roundup
-    Course Roundup
-    Course Slides
-    Bonus: More Content!
+
+    484 - Course Roundup
+        Seguir codeando, probando cosas, apis, etc.
+        Meterse aún mas en el desarrollo fronted.
+
+    485 -Course Slides
+        Attached you can find the course slides.
+
+        Recursos de esta clase
+        slides.pdf
+
+    486 - Bonus: More Content!
+        Bonus: More Content!
+        I got a lot of other high-quality & bestselling courses you might be interested in: https://academind.com/learn/our-courses/
+
+        I'd love to welcome you on board of any of these courses! :-)
+
+        Also don't forget to subscribe to my newsletter on https://academind.com/ to receive the latest updates and exclusive offers!
+
+        And in case you didn't know: On the same page as well as on my YouTube channel I got loads of additional tutorials.
+
+        Last but not least - I tweet on @maxedapps and on @academind_real, would love to see you there!
 
 -------------------- IDEAS BELGA ---------------------------------
 
