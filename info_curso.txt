@@ -2329,6 +2329,11 @@
             .collection('products')
 
     183 - Understanding the MongoDB Compass
+        Descargar MongoDB Compass (ya lo tenía descargado)
+        Ir a Atlas > Collections > Conectar con Compass, copiar el link, abrir compass (detecta solo el link)
+        mongodb+srv://admin_mongo:ywGX4vucwQksRGIb@cluster0-xoskd.mongodb.net/test
+        poner el user, pass y conectar.
+
     184 - Fetching All Products
     185 - Fetching a Single Product
     186 - Making the "Edit" & "Delete" Buttons Work Again
@@ -3020,7 +3025,7 @@
 
 ------------------------------------------------------------------
 
-# Node.js as a Build Tool & Using npm
+# Sección 31 - Node.js as a Build Tool & Using npm
 
     477 - Module Introduction
         Que cosas se pueden hacer con node.
@@ -3085,7 +3090,7 @@
 
 ------------------------------------------------------------------
 
-# Roundup
+# Sección 32 - Roundup
 
     484 - Course Roundup
         Seguir codeando, probando cosas, apis, etc.
