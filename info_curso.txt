@@ -2531,20 +2531,21 @@
         01-using-nodemailer-to-send-emails.zip
 ------------------------------------------------------------------
 
-# Advanced Authentication
+# Sección 17 - Advanced Authentication
 
-    Module Introduction
-    Resetting Passwords
-    Implementing the Token Logic
-    Creating the Token
-    Creating the Reset Password Form
-    Adding Logic to Update the Password
-    Why we Need Authorization
-    Adding Authorization
-    Adding Protection to Post Actions
-    Why Editing Fails
-    Wrap Up
-    Useful Resources & Links
+    274 - Module Introduction
+        Resetear passwords, authorization.
+    275 - Resetting Passwords
+    276 - Implementing the Token Logic
+    277 - Creating the Token
+    278 - Creating the Reset Password Form
+    279 - Adding Logic to Update the Password
+    280 - Why we Need Authorization
+    281 - 280 - Adding Authorization
+    282 - Adding Protection to Post Actions
+    283 - Why Editing Fails
+    284 - Wrap Up
+    285 - Useful Resources & Links
 
 ------------------------------------------------------------------
 
@@ -2839,35 +2840,129 @@
 
 ------------------------------------------------------------------
 
-# Understanding Async Await in Node.js
+# Sección 26 - Understanding Async Await in Node.js
 
-    Module Introduction
-    What is Async Await All About?
-    Transforming "Then Catch" to "Async Await"
-    Time to Practice - Async Await 
-    1 pregunta
-    The User Name is Missing!
-    Wrap Up
-    Useful Resources & Links
+    396 - Module Introduction
+    397 - What is Async Await All About?
+        Son dos palabaras reservadas.
+        
+        Sirve para generar request de manera asincronica, o sea, que si estas haciendo algo podes ir a hacer otra cosa y e ir a donde estaba ese algo cuando se termine.
+    
+    398 - Transforming "Then Catch" to "Async Await"
+        
+        async: se pone adelante de la función que queremos que sea asincronica.
+        await: Los await se utilizan para frenar la ejecución de los llamados en las que su respuesta es necesaria para el siguiente paso.
+
+        Time to Practice - Async Await // NO LA HICE.
+        
+            Tarea: Time to Practice - Async Await
+            13 minutos para finalizar146 soluciones del estudiante
+            Asyncs Await should be clear shouldn't it? Time to test our newly gained knowledge!
+
+    399 - The User Name is Missing!
+            Maybe you noticed that on the frontend, the username is missing.
+
+            We'll fix that in the next modules but you can also fix it right now of course.
+
+            The reason for it missing is that I accidentally removed the populate('creator') step when fetching the post data in our controller action.
+
+            Example:
+
+            When fetching posts, this snippet:
+
+            Post.find()
+                .countDocuments()
+                .then(count => {
+                totalItems = count;
+                return Post.find()
+                    .skip((currentPage - 1) * perPage)
+                    .limit(perPage);
+                })
+            should become
+
+            Post.find()
+                .countDocuments()
+                .then(count => {
+                totalItems = count;
+                return Post.find()
+                    .populate('creator')
+                    .skip((currentPage - 1) * perPage)
+                    .limit(perPage);
+                })
+
+    402 - Wrap Up
+        
+        Para Mongoose, si bien no retorna realmente promesas, se puede usar async await.
+        Si es realmente necesario a las funcione al final se le debe agregar .exec();
+
+    403 - Useful Resources & Links
+
+        Useful Resources & Links
+        Attached, you find the source code for this section.
+
+        When using my source code, make sure to run npm install in the extracted folder!
+
+        Useful resources:
+
+        Async-await - More Details: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/async_function
+
+        Recursos de esta clase
+        01-transforming-then-catch.zip
+        assignment-backend-solution.zip
+        assignment-frontend-solution.zip
 
 ------------------------------------------------------------------
 
-# Understanding Websockets & Socket.io
+# Sección 27 - Understanding Websockets & Socket.io
 
-    Module Introduction
-    What Are Websockets & Why Would You Use Them?
-    Websocket Solutions - An Overview
-    Setting Up Socket.io on the Server
-    Establishing a Connection From the Client
-    Identifying Realtime Potential
-    Sharing the IO Instance Across Files
-    Synchronizing POST Additions
-    Fixing a Bug - The Missing Username
-    Updating Posts On All Connected Clients
-    Sorting Correctly
-    Deleting Posts Across Clients
-    Wrap Up
-    Useful Resources & Links
+    402 - Module Introduction
+        Porque usar realtime.
+        Como agregar comunicacíón real a mi aplicación de Node.
+
+    403 - What Are Websockets & Why Would You Use Them?
+        
+        Cliente -> 1 Request ->   Servidor
+                <- 2 Response <-----
+
+        WebSockets: (usa el protocolo http)
+         
+        Cliente -> 1 Send Data ->   Servidor
+                <- 2 Push Data  <-----
+
+    404 - Websocket Solutions - An Overview
+        Socket.io
+
+    405 - Setting Up Socket.io on the Server
+        
+        npm install --save socket.io
+
+        const server = app.liten(3000);
+        const io = require('socket.io')(server);
+        // se ejecuta para cada cliente que se conecte.
+        io.on('connection', socket => {
+            console.log('Cliente conectado');
+        });
+
+    406 - Establishing a Connection From the Client
+        
+        npm install --save socket.io-client
+        
+        Es el código que corre en nuestro cliente.
+
+        import openSocket from 'socket.io-client';
+        openSocket('http://localhost:3000')
+
+        * Ver bien esto porque lo esta haciendo sobre una aplicación react que no se de donde salió.
+        
+    407 - Identifying Realtime Potential
+    408 - Sharing the IO Instance Across Files
+    409 - Synchronizing POST Additions
+    500 - Fixing a Bug - The Missing Username
+    501 - Updating Posts On All Connected Clients
+    502 - Sorting Correctly
+    503 - Deleting Posts Across Clients
+    504 - Wrap Up
+    505 - Useful Resources & Links
 
 ------------------------------------------------------------------
 
