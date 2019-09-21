@@ -1,6 +1,6 @@
-# Sección 1 - Introduction
-    Introduction
-    What is Node.js?
+# Sección 1 - DONE - Introduction
+    1 - Introduction
+    2 - What is Node.js?
         
         Runtime
         JS: 
@@ -11,7 +11,7 @@
             O sea, con node js, podes agregar funcionalidad al engine V8, para acceder por ej a archivos.
 
 
-    Installing Node.js and Creating our First App
+    3 - Installing Node.js and Creating our First App
 
         - Crea una carpeta
         - crea un archivo first-app.js
@@ -21,7 +21,7 @@
 
                 fs.writeFileSync('hello.txt', "Hola mundo!");
 
-    Understanding the Role & Usage of Node.js
+    4 - Understanding the Role & Usage of Node.js
         
         Explica como el usuario hace una petición, se le devuelven archivos, y aparte con node js, se accede a base de datos, se puede autenticar en otros sitios con oauth, validar inputs, logica de negocio etc.
         Comenta que se puede hacer para hacer mas cosas que esto, scripts, compilar herramientas, etc.
@@ -31,11 +31,11 @@
 
         Python, PHP, DJIANGO, net core, ETC, son una alternativa a Node js
 
-    Course Outline
+    5 - Course Outline
 
         Habla de lo que va del curso, lo saltee, habla de todo eso que se ve en la pantalla.
 
-    How To Get The Most Out Of The Course
+    6 - How To Get The Most Out Of The Course
 
         Como sacarle provecho al crso...
             mirar los videos
@@ -44,7 +44,7 @@
             hacer preguntas
             ayudar a otros que hacen preguntas
 
-    Working with the REPL vs Using FIles
+    7 - Working with the REPL vs Using FIles
 
         R ead (leer el input del usuario)
         E val (evaluar el input del usuario)
@@ -59,7 +59,7 @@
             usado para hacer aplicaciones reales
             secuencia de pasos.
 
-    Using the Attached Source Code
+    8 - Using the Attached Source Code
         
         Explica como usar el codigo que viene en el curso, en ingles, es solo ste texto:
 
@@ -81,26 +81,214 @@
 
 # Sección 2 - Optional: JavaScript - A Quick Refresher
     
-    Module Introduction
-    JavaScript in a Nutshell
-    Refreshing the Core Syntax
-    let & const
-    Understanding Arrow Functions
-    Working with Objects, Properties & Methods
-    Arrays & Array Methods
-    Arrays, Objects & Reference Types
-    Understanding Spread & Rest Operators
-    Destructuring
-    Async Code & Promises
-    Template Literals
-    Wrap Up
-    Useful Resources & Links
+    9 - Module Introduction
+        Un refresco de EMC6
 
+    10 - JavaScript in a Nutshell
+        
+        - Débilmente tipado
+            no tenemos una asignación de tipo explícita
+        - POO
+        - puede usarlo con nodejs para ejecutarlo en tu PC
+        - 
+    11 - Refreshing the Core Syntax
+
+        node archivo.js --se va a ejecutar el código.
+        Muestra como hacer una función y que devuelva info por consola.
+
+    12 - let & const
+
+        let depende del bloque donde se ejecute
+        const es algo que nunca va a cambiar
+
+    13 - Understanding Arrow Functions
+
+        let & const, como funcionan:
+
+        // función anonima que se aloja en la constante "unaFuncion"
+            const unaFuncion = (parametros) => {
+                return parametros;
+            }
+
+        // sintaxis reducida
+            const unaFuncion = (parametros) => { parametros };
+
+        // mas reducida, si tenes un solo parametros:
+            const unaFuncion = parametros => { parametros };
+
+        // sin argumentos:
+            const sayHello = () => { console.log("hola") };
+
+    14 - Working with Objects, Properties & Methods
+
+        objeto:
+        const person = {
+            name: 'Max',
+            age: 29
+            age: () => {
+                console.log('Hello, Im : ' + this.name); // NO puedo usar this usando una función anonima, porque sino hace referencia a window no a este objeto en particular, para eso tengo que usar una función vieja, osea:
+            }
+            ageFuncion: function() {
+                console.log(this.name);
+            },
+            ageFuncionTambienSirve() {
+                console.log(this.name);
+            }
+        }
+
+        console.log(person);
+
+    15 - Arrays & Array Methods
+        
+        const hobbies = ['deportes', 'cocinar', true, 1];
+        for(let hobby of hobbies){
+            console.log(hobby);
+        }
+
+        Para transformar los valores del array y devolver uno nuevo:
+
+            console.log(hobbies.map(hobby => 'Hobby: ' + hobby; ));
+            console.log(hobbies);
+
+    16 - Arrays, Objects & Reference Types
+        Son tipos de referencia, puedo cambiar la información y que perdure, no así en una variable, menos en una constante que no se puede cambiar.
+
+        const hobbies = ['deportes', 'cocinar'];
+
+        hobbies.push("Progrador");
+        console.log(hobbies);
+
+        // Los tipos de referencia, almacenan una dirección que apunta a un lugar en memoria, donde se guardo el array x ej, por ende eso no cambia solo su contenido.
+
+
+    17 - Understanding Spread & Rest Operators
+
+        // Creamos una nueva matriz, sin editar la original pero agregamos el nuevo valor. PATRON DE INMUTABILIDAD.
+           No se editan valores existentes, reemplazamos con una copia mas sus cambios.
+        
+        // EJEMPLO 1 - MASO, con slice:
+            const hobbies = ['deportes', 'cocinar'];
+            const copiedArray = hobbies.slice(); // se le puede pasar parametros para ver que parametros copiar sin params copia todo.
+            console.log(copiedArray);
+
+        // EJEMPLO 2 - NO!:
+            const hobbies = ['deportes', 'cocinar'];
+            const copiedArray = [hobbies] // Es un array que tiene otro nuevo array adentro, no es una copia
+            console.log(copiedArray);
+
+        // EJEMPLO 3 - MEJOR, con el operador: spread
+            const hobbies = ['deportes', 'cocinar'];
+            const copiedArray = [...hobbies] // pone en el nuevo array los items ordenados, o sea, saca uno por uno y los pone en el array nuevo.
+            console.log(copiedArray);
+
+        Objeto:
+            const copiedPerson = {...person};
+            console.log(copiedPerson);
+
+        // EJEMPLO 4:
+            const toArray = (...args) => {
+                return args;
+            }
+
+            console.log(toArray(1,2,3,4));
+
+    18 - Destructuring
+
+        // EJEMPLO 1:
+            const person = {
+                name: 'Max',
+                age: 29
+                age: () => {
+                    console.log('Hello, Im : ' + this.name); // NO puedo usar this usando una función anonima, porque sino hace referencia a window no a este objeto en particular, para eso tengo que usar una función vieja, osea:
+                }
+                ageFuncion: function() {
+                    console.log(this.name);
+                },
+                ageFuncionTambienSirve() {
+                    console.log(this.name);
+                }
+            }
+            
+            const printName = ({ name }) => { //hay que poner la propiedad que necesitamos, del objeto que nos pasan, nada mas
+                console.log(name);
+            }
+
+            printName(person);
+
+        // EJEMPLO 2:
+            const { name, age } = person;
+            console.log(name, age);
+
+        // EJEMPLO 3:
+            const hobbies = ['Sports', 'Cooking'];
+            const [hobby1, hobby2] = hobbies;
+            console.log(hobby1, hobby2);
+
+    19 - Async Code & Promises
+        
+        const promise = new Promise((resolve, reject) => {
+            // code...
+            return promise;
+        }
+
+    20 - Template Literals
+        
+        One other feature, we'll use from time to time are template literals: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Template_literals
+
+        It's a different way of writing strings.
+
+        Instead of using double or single quotation marks:
+
+        'A String'
+
+        or
+
+        "Another string"
+
+        you can use backticks (`)
+
+        `Another way of writing strings`
+
+        Now why would we use that way of creating strings?
+
+        With that syntax, you can dynamically add data into a string like this:
+
+        const name = "Max";
+        const age = 29;
+        console.log(`My name is ${name} and I am ${age} years old.`);
+        This is of course shorter and easier to read than the "old" way of concatenating strings:
+
+        const name = "Max";
+        const age = 29;
+        console.log("My name is " + name + " and I am " + age + " years old.");
+
+    21 - Wrap Up
+        las cosas que se vieron...
+    22 - Useful Resources & Links
+        Useful Resources & Links
+        Attached, you find the source code for this section.
+
+        Useful resources:
+
+        MDN JavaScript Tutorial: https://developer.mozilla.org/en-US/docs/Learn/JavaScript
+
+        Academind JS Resources: https://academind.com/learn/javascript
+
+        Recursos de esta clase
+        01-core-js-syntax.zip
+        02-let-and-const.zip
+        03-arrow-functions.zip
+        04-objects.zip
+        05-arrays.zip
+        06-arrays-and-reference-types.zip
+        07-spread-and-rest.zip
+        08-destructuring.zip
+        09-async-code.zip
 ------------------------------------------------------------------
 
 # Sección 3 - Understanding the Basics
 
-    Module Introduction
+    23 - Module Introduction
 
         Como funciona la Web
         Crear un servidor con node js
@@ -108,7 +296,7 @@
         trabajar con request y response        
         codigo asincrono y "the event loop"
 
-    How The Web Works
+    24 - How The Web Works
 
         Usuario/Cliente (Request) -> 
             Navegador -> 
@@ -131,7 +319,7 @@
                 HTTP + Data encriptada (durante la transmisión)
                     Para que tu información este segura y estes seguro que nadie este robando la info etc.
 
-    Creating a Node Server
+    25 - Creating a Node Server
         
         Modulos Core 
             
@@ -163,7 +351,7 @@
                 console.log("Servidor corriendo en el puerto: 3000");
             });
 
-    The Node Lifecycle & Event Loop
+    26 - The Node Lifecycle & Event Loop
 
         node app.js -> 
             start script -> 
@@ -172,12 +360,12 @@
 
         //process.exit(); // Podríamos utilizar esto apra terminar el proceso, pero no tiene sentido stopear un servidor web.
 
-    Controlling the Node.js Process
+    27 - Controlling the Node.js Process
 
         Want to quit your running Node.js server?
         You can always do that by pressing CTRL + C in the terminal/ command prompt window where you started your server (i.e. where you ran node app.js).
 
-    Understanding Requests
+    28 - Understanding Requests
 
         console.log(req), vemos Metadatos informados en el request.
             host... headers agregados por el usuario en el request, etc.
@@ -199,7 +387,7 @@
             
         La url es cualquier cosa después de nuestro host, o sea después de la ip (hablando localmente)
 
-    Sending Responses
+    29 - Sending Responses
 
         response.setHeader('Content-Type','text/html'); // Setea el tipo de respuesta que va a devolver.
         response.write('<html>'); // Escribe multiples lineas de información
@@ -208,7 +396,7 @@
         response.write('</html>'); // Escribe multiples lineas de información
         response.end();
 
-    Request & Response Headers
+    30 - Request & Response Headers
 
         On both requests and responses, Http headers are added to transport metadata from A to B.
 
@@ -217,7 +405,7 @@
         Whilst this article is a great resource, especially to dive deeper, please don't learn this list by heart though! You'll encounter many of these headers throughout the course and I'll explain them when we need them.
 
         
-    Routing Requests
+    31 - Routing Requests
 
         app.js
             const url = request.url;
@@ -230,7 +418,7 @@
                 return response.end(); // El return es para no continuar con la ejecución del codigo
             }
 
-    Redirecting Requests
+    32 - Redirecting Requests
 
         app.js
             if(url === '/mensaje' && method === 'POST'){
@@ -241,7 +429,7 @@
                 return res.end();
             }
 
-    Parsing Request Bodies
+    33 - Parsing Request Bodies
     
         Los datos que vienen por request, son enviados como una "corriente" stream, de datos.
         => Buffer:
@@ -276,11 +464,11 @@
                     return res.end();
             }
 
-    Understanding Event Driven Code Execution
+    34 - Understanding Event Driven Code Execution
 
-        Explica el orden en el que se   ejecuta el codigo Node js...
+        Explica el orden en el que se ejecuta el codigo Node js...
 
-    Blocking and Non-Blocking Code
+    35 - Blocking and Non-Blocking Code
 
         // Es sincronico, así que bloquea las siguientes ejecuciones.
             fs.writeFileSync('archivo.txt', mensaje);
@@ -294,7 +482,7 @@
                 return res.end();
             });
 
-    Node.js - Looking Behind the Scenes
+    36 - Node.js - Looking Behind the Scenes
 
         Explica que pasa detras de escena.
 
@@ -302,7 +490,7 @@
         
         * VER OTRA VEZ. Lo pase..
 
-    Using the Node Modules System
+    37 - Using the Node Modules System
 
         Corta todo lo que es de ruteo que estaba en app.js y lo pone en routes.js
         Explica como exportar el modulo y utilizarlo desde otro archivo.
@@ -340,11 +528,11 @@
                 const server = http.createServer(routes.handler);
                 console.log(routes.someText);
 
-    Wrap Up
+    38 - Wrap Up
 
         Resumen de todo el modulo.
         
-    Time to Practice - The Basics 
+        Time to Practice - The Basics 
         /*
         Tarea:
 
@@ -359,7 +547,7 @@
 
         La hice :)
 
-    Useful Resources & Links
+    39 - Useful Resources & Links
 
         Attached, you find the source code for this section.
 
@@ -382,8 +570,8 @@
 
 # Sección 4 - Improved Development Workflow and Debugging
 
-    Module Introduction
-    Understanding NPM Scripts
+    40 - Module Introduction
+    41 - Understanding NPM Scripts
 
         npm.org
         1) > npm init
@@ -395,7 +583,7 @@
         
         3) > npm start // para ejecutar ese script
 
-    Installing 3rd Party Packages
+    42 - Installing 3rd Party Packages
 
         1) Instalar paquetes de 3ros
         2) > npm install nodemon --save-dev
@@ -403,7 +591,7 @@
             --save-dev // Para que se guarde como dependencia de desarrollo
         3) 
     
-    Global Features vs Core Modules vs Third-Party Modules
+    43 - Global Features vs Core Modules vs Third-Party Modules
 
         The last lectures contained important concepts about available Node.js features and how to unlock them.
 
@@ -437,11 +625,11 @@
             // In code file (e.g. app.js)
                 const sessions = require('express-session');
 
-    Using Nodemon for Autorestarts
+    44 - Using Nodemon for Autorestarts
 
         Explica como funciona nodemon..
 
-    Global & Local npm Packages
+    45 - Global & Local npm Packages
 
         In the last lecture, we added nodemon as a local dependency to our project.
 
@@ -453,7 +641,7 @@
 
         You could install nodemon globally if you wanted (this is NOT required though - because we can just run it locally): npm install -g nodemon would do the trick. Specifically the -g flag ensures that the package gets added as a global package which you now can use anywhere on your machine, directly from inside the terminal or command prompt.
 
-    Understanding different Error Types
+    46 - Understanding different Error Types
 
         Errores de sintaxis
             Cuando le pifias a un ; o lo que sea, se te marca en rojo al toque en el IDE
@@ -464,25 +652,25 @@
         Errores Logicos
             No ves un mensaje de error, y son dificles de encontrar
     
-    Finding & Fixing Syntax Errors
+    47 - Finding & Fixing Syntax Errors
 
         Si bien se ven en rojo en la pantalla, también te podes dar cuenta cuando compilas y te dice el error donde esta..
 
-    Dealing with Runtime Errors
+    48 - Dealing with Runtime Errors
 
         Errores por los cuales por ej, el codigo sigue a una parte que no tenia que seguir.. etc
         También se pueden ver cuando compilas la aplicación
 
-    Logical Errors
+    49 - Logical Errors
 
         Explica que hay errores que no saltan y te podes volver loco buscandolos, como poner mal un indice bla.
         Explica también un poco de como debugear..
 
-    Using the Debugger
+    50 - Using the Debugger
 
        Explica como usar el debug
 
-    Restarting the Debugger Automatically After Editing our App
+    51 - Restarting the Debugger Automatically After Editing our App
 
           Depurar > Abrir configuraciones
 
@@ -494,7 +682,7 @@
         Esto sirve para que también se restartee cuando estes debugeando y cambiaste algo.
         Si da error es porque no habíamos instalao nodemon globalmente. 
 
-    Debugging Node.js in Visual Studio Code
+    52 - Debugging Node.js in Visual Studio Code
     
         Want to dive super-deep into the latest debugging capabilities Visual Studio Code gives you (for Node.js apps)?
 
@@ -502,13 +690,13 @@
         
     
     
-    Changing Variables in the Debug Console
+    53 - Changing Variables in the Debug Console
     
         Muestra como cambiar una variable en Visual Studio Code, sobretodo como cambiar las constantes.
     
-    Wrap Up
+    54 - Wrap Up
         Resumen del modulo.
-    Useful Resources & Links
+    55 - Useful Resources & Links
 
         Attached, you find the source code for this section.
 
@@ -529,8 +717,8 @@
 
 # Sección 5 - Working with Express.js
 
-    Module Introduction
-    What is Express.js?
+    56 - Module Introduction
+    57 - What is Express.js?
 
         Es un framework:
             Funciones de ayuda, herramientas, reglas que te ayudan a contruir tu aplicación.
@@ -545,7 +733,7 @@
             Sails.js
             ...
 
-    Installing Express.js
+    58 - Installing Express.js
 
         > npm install express --save // Para instalar en prod
 
@@ -554,7 +742,7 @@
         // Creamos una aplicación y la guardamos en una constante para correr express como una función
         const app = express();
 
-    Adding Middleware
+    59 - Adding Middleware
 
         Middleware:
             Significa que todos los request automaticamente son canalizados a traves de estas funciones por express.
@@ -575,23 +763,23 @@
             //     //next();
             // });
 
-    How Middleware Works
+    60 - How Middleware Works
 
         res.send('<h1>Hola desde Express</h1>'); // Envia una respuesta
         Por defecto el tipo de respuesta es text/html
     
-    Express.js - Looking Behind the Scenes
+    61 - Express.js - Looking Behind the Scenes
 
         Muestra el codigo de Express en Github
         app.list(puerto)
         
-    Handling Different Routes
+    62 - Handling Different Routes
     
         Como rutear con Express.
         Siempre tienen que ir las personalizadas antes que la / porque sino nunca entrarían en esas..
         SALVO QUE SE PONGA NEXT.
 
-    Time to Practice - Express.js 
+    63 - Time to Practice - Express.js 
 
         Tarea 2:
 
@@ -600,7 +788,7 @@
         3. Manejar request para / y /usuarios que cada uno tenga al menos un handler/middleare que haga algo como enviar response dummy
 
 
-    Parsing Incoming Requests
+    64 - Parsing Incoming Requests
     
         Por defecto el body no se parsea, es por esto que se usa body-parser
 
@@ -612,7 +800,7 @@
 
         Se obtiene clave/valor.
 
-    Limiting Middleware Execution to POST Requests
+    65 - Limiting Middleware Execution to POST Requests
     
         En vez de usar app.use se usa:
              app.get
@@ -621,7 +809,7 @@
              app.patch
              ...
              
-    Using Express Router
+    66 - Using Express Router
     
         app.js
             const adminRoutes = require('./routes/admin');
@@ -656,11 +844,11 @@
 
             module.exports = router;
 
-    Adding a 404 Error Page
+    67 - Adding a 404 Error Page
 
         Se agrega la ruta para la pag 404
 
-    Filtering Paths
+    68 - Filtering Paths
 
         Para que los archivos de ruteo no se llmen directamentes así en el navegador:
             ttp://localhost:3000/add-producto
@@ -670,11 +858,11 @@
         app.use('/admin',adminRoutes);
         app.use('/shop',shopRoutes);
     
-    Creating HTML Pages
+    69 - Creating HTML Pages
     
         Crear la carpeta views, donde van a estar las vistas de nuestra app
     
-    Serving HTML Pages
+    70 - Serving HTML Pages
 
         shop.js
             const path = require('path');
@@ -694,13 +882,13 @@
             const path = require('path');
             module.exports = path.dirname(process.mainModule.filename);
 
-    Styling our Pages
+    71 - Styling our Pages
     
         Averiguar que es CSS bem
             Algo asi como, una manera de nomenclar las clases para que no haya repetidas.
 
     
-    Serving Files Statically
+    72 - Serving Files Statically
     
         crea la carpeta public
         Agregamos a uno de los html:
@@ -711,7 +899,7 @@
             app.use(express.static(path.join(__dirname,'public')));
 
     
-    Time to Practice - Navigation 
+    73 - Time to Practice - Navigation 
     
         Tarea 3:
 
@@ -722,10 +910,10 @@
             // TO DO
             TAREA PENDIENTE.
 
-    Wrap Up
+    74 - Wrap Up
         Resumen del curso
 
-    Useful Resources & Links
+    75 - Useful Resources & Links
 
         Attached, you find the source code for this section.
 
@@ -745,12 +933,12 @@
 
 # Sección 6 - Working with Dynamic Content & Adding Templating Engines
 
-    Module Introduction
-    Sharing Data Across Requests & Users
+    76 - Module Introduction
+    77 - Sharing Data Across Requests & Users
     
         Importar un modulo en otro, para obtener info, ej de adminData -> productos
     
-    Templating Engines - An Overview
+    78 - Templating Engines - An Overview
 
         HTMLish Template
             HTML
@@ -773,7 +961,7 @@
                 - Normal HTML y un lenguaje de template customizado
                 <p>{{name}}</p>
 
-    Installing & Implementing Pug
+    79 - Installing & Implementing Pug
     
         - > npm install --save ejs pug express-handlebars
             express-handlebars -> usamos ese porque esta incorporado con Express
@@ -803,7 +991,7 @@
             res.render('shop');
 
 
-    Outputting Dynamic Content
+    80 - Outputting Dynamic Content
     
         Para pasar info a la vista, desde el servidor:
             res.render('shop', { prods: products, docTitle: "Shop" });
@@ -815,15 +1003,15 @@
                 each prod in prods
             
 
-    Official Pug Docs
+    81 - Official Pug Docs
 
         Want to learn more about Pug? Check out their official docs: https://pugjs.org/api/getting-started.html
     
-    Converting HTML Files to Pug
+    82 - Converting HTML Files to Pug
 
         Hace el resto de los archivos que eran html, pug.
     
-    Adding a Layout
+    83 - Adding a Layout
 
         1) En la pagina layout, se ponen los bloques que se importan de cada vista correspondiente
 
@@ -841,13 +1029,18 @@
             block content
                 h1 Page Not Found
 
-    Finishing the Pug Template
+    84 - Finishing the Pug Template
     
         Como marcar que vista es la activa en la navegación, considerando que ahora tenemos vistas parciales, layout..
             Le pasa el path, en su ruta, y valida eso por codigo, con javascript, que va dentro de parentesis.
                 a(href="/shop", class="(path==='/shop' ? 'active' : '')) Shop
 
-    Working with Handlebars
+    85 - Avoiding an Error
+        In the next lecture, we'll have a look at a different view engine: Handlebars.
+
+        Due to a (temporary) breaking change introduced by the library authors (of the package we'll install in the next lecture), make sure you run npm install --save express-handlebars@3.0 before you start using that package in the next lecture.
+    
+    86 - Working with Handlebars
     
         app.engine('handlears',expressHbs());
         app.set('view engine', 'handlebars');
@@ -860,7 +1053,7 @@
         En la vista las propiedades se usan así:
         {{ pageTitle }}
         
-    Converting our Project to Handlebars
+    87 - Converting our Project to Handlebars
     
         if como este, no es soportado, se tiene que evaluar algo por true o false, 
         por ende esta validación hay que hacerla del lado del servidor y pasarla a la vista.
@@ -881,7 +1074,7 @@
         Esto hace que la logica este del lado del servidor, almenos para handlebars debe trabajarse así, la vista es solo para mostrar cosas.
 
     
-    Adding the Layout to Handlebars
+    88 - Adding the Layout to Handlebars
 
          app.engine('hbs',expressHbs({ layoutsDir: 'views/layouts/',defaultLayout: 'main-layout'}));
 
@@ -896,7 +1089,7 @@
 
             Las vistas que tengna la info dentro de main, son las que van a ser embebidas en la vista layout en la aprte {{body}}
 
-    Working with EJS
+    89 - Working with EJS
     
         No soporta layouts.
 
@@ -905,16 +1098,16 @@
         <% for (let product of prods) { %>
 
         <% } %>
-    Working on the Layout with Partials
+    90 - Working on the Layout with Partials
 
          <%- include('includes/navigation.ejs') %>
          <%- include('includes/end.ejs') %>
          
-    Wrap Up
+    91 - Wrap Up
     
         Resumen de todo..
 
-    Time to Practice - Templating Engines 
+        Time to Practice - Templating Engines 
     
         We learned a lot about Pug, Handlebars and EJS so let's see if we know how to use these templating engines now!
         
@@ -928,8 +1121,9 @@
             // TO DO
             TAREA PENDIENTE. No esuche el video solo anote lo que estaba en pantalla.
 
-
-    Useful Resources & Links
+    92 - [OPTIONAL] Assignment Solution
+        Muestra la solución que hizo el de la tarea.
+    93 - Useful Resources & Links
 
         Attached, you find the source code for this section.
 
@@ -952,8 +1146,8 @@
 
 # Sección 7 - The Model View Controller (MVC) - Sección 7
    
-    92 - Module Introduction
-    93 - What is the MVC?
+    94 - Module Introduction
+    95 - What is the MVC?
 
         Se trata de una (separation of concerns) separación de preocupaciones.
         Te aseguras que las diferentes partes de tu código hagan cosas diferentes y usted sepa claramente qué parte es responsable de qué. 
@@ -981,7 +1175,7 @@
             Definen en que ruta encontrar tanto los metodos de los controladores como los metodos http que necesitamos
 
         
-    94 - Adding Controllers
+    96 - Adding Controllers
     
         A lo que se llama "logica intermediaria" del controlador, es a la parte del middlewareque se utiliza entre que se llama a la ruta necesaria y lo que retorna.
         Podes crear difrentes tipos de controladores, por ej adminController, productController, userController, y en cada uno manejar lo necesario para ese concepto.
@@ -990,11 +1184,11 @@
         O sea, lo que hacemos es, en index, decir que la ruta x ej /admin va a usar información del archivo de ruteo de admin, por otro lado en las rutas, 
         pongo el codigo de los diferentes metodos en el controlador de productos, y aca solo utilizo el controlador
     
-    95 - Finishing the Controllers
+    97 - Finishing the Controllers
     
         El use de la pagina de error, lo deja en el index del server, importa el controlador error que creó, mete su logica intermediaria ahí y usa eso.
         
-    96 - Adding a Product Model
+    98 - Adding a Product Model
     
         Basicamente una o varias clases que representen a los tipos de objetos con los que vamos a estar trabajando y con sus difentes metodos.
         
@@ -1010,7 +1204,7 @@
 
         Después en los respectivos contorladores llamamos a nuestro modelo y lo utilizamos segun correspnda.
 
-    97 - Storing Data in Files Via the Model
+    99 - Storing Data in Files Via the Model
     
         Agrega una carpeta de data, para mostrar esto.
         En el modelo en la parte de guardar, genera el codigo para escribir el archivo. 
@@ -1023,7 +1217,7 @@
         JSON.parse // parsea el objeto en un Array
         JSON.stringify // convierte el array enjso
             
-    98 - Fetching Data from Files Via the Model
+    100 - Fetching Data from Files Via the Model
     
         Como la función es estatica y se ejecuta ni bien se inicia, porque eso pasa con las clases estaticas, no es necesario llamarlas porque ya estan cargadas.
         el codigo se ejecuta asincronico (fs.readFile) que no lee el archivo de manera inmediata sino que registra el callback y termina la función, por eso se devuelve un array vacio.
@@ -1040,15 +1234,15 @@
             Por ultimo se modifica el getProductos, para renderizar en la parte del callback
                 Ver ejemplo en carpeta 98 
 
-    99 - Refactoring the File Storage Code
+    101 - Refactoring the File Storage Code
     
         Modifica codigo repetivo en una función helper que obtiene el archivo y reemplaza eso donde se estaba reptiendo el codigo.
     
-    100 - Wrap Up
+    102 - Wrap Up
 
         Resumen
     
-    101 - Useful Resources & Links
+    103 - Useful Resources & Links
 
         Attached, you find the source code for this section.
 
@@ -1067,22 +1261,24 @@
 ------------------------------------------------------------------
 
 # Sección 8 - Optional: Enhancing the App
-    Module Introduction
+    
+    104 - odule Introduction
 
         Practicar lo que se aprendió agregando info al proyecto, es opcional este modulo.
     
-    Creating the Shop Structure
-    Working on the Navigation
-    Registering the Routes
-    Storing Product Data
-    Displaying Product Data
-    Editing & Deleting Products
-    Adding Another Item
-    Useful Resources & Links
+    105 - Creating the Shop Structure
+    106 - Working on the Navigation
+    107 - Registering the Routes
+    108 - Storing Product Data
+    109 - Displaying Product Data
+    110 - Editing & Deleting Products
+    111 - Adding Another Item
+    112 - Useful Resources & Links
 
 ------------------------------------------------------------------
 
 # Sección 9 - Dynamic Routes & Advanced Models - Sección 9
+    
     113 - Module Introduction
     
         Aprender sobre 
@@ -1688,7 +1884,7 @@
     
     162 - Using Magic Association Methods
 
-    // podemos agregar el usuario acá:
+        // podemos agregar el usuario acá:
         
         exports.postAddProduct = (req, res, next) => {
         const title = req.body.title;
@@ -1703,7 +1899,7 @@
             userId: req.user.id
         })
 
-    // Hay otra manera:
+        // Hay otra manera:
          req.user
             .createProduct({
                 title: title,
@@ -2335,6 +2531,8 @@
         poner el user, pass y conectar.
 
     184 - Fetching All Products
+        models/products
+            
     185 - Fetching a Single Product
     186 - Making the "Edit" & "Delete" Buttons Work Again
     187 - Working on the Product Model to Edit our Product
@@ -2396,7 +2594,18 @@
 # Sección 13 - Working with Mongoose
 
     Module Introduction
+        Es un ODM para MongoDB como Sequelize para SQL
     What is Mongoose?
+        ODM
+        Object Document Mapping Library.
+        Los conceptos centrales son que trabajamos con esquemas y modelos donde definimos cómo deberían ser nuestros datos y luego tenemos las llamadas instancias donde instanciamos nuestros modelos,
+
+        Entonces, cuando creamos objetos javascript reales con los que podemos trabajar que se basan en nuestros planos
+
+        y una vez que tenemos esa configuración, podemos ejecutar consultas y allí nuevamente usamos nuestros objetos, usamos nuestros modelos
+
+        y luego podemos consultar la base de datos
+
     Connecting to the MongoDB Server with Mongoose
     Creating the Product Schema
     Saving Data Through Mongoose
@@ -2791,6 +3000,169 @@
         Recursos de esta clase
         01-added-checkout-page.zip
         02-using-stripe.zip
+
+    356 - Migrating Stripe Implementation
+
+        Until the previous video is updated, too, here are the steps you can take to move to the improved, recommended payment flow (building up on the implementation we had in the previous video):
+
+        Of course you find the finished, adjusted setup attached!
+
+        In checkout.ejs:
+
+        REMOVE this part
+
+        <form action="/create-order" method="POST">
+            <script
+                src="https://checkout.stripe.com/checkout.js" class="stripe-button"
+                data-key="<YOUR STRIPE PUBLIC KEY>"
+                data-amount="<%= totalSum * 100 %>"
+                data-name="Your Order"
+                data-description="All the items you ordered"
+                data-image="https://stripe.com/img/documentation/checkout/marketplace.png"
+                data-locale="auto"
+                data-currency="usd">
+            </script>
+        </form>
+
+        Instead, ADD this code:
+
+        <button id="order-btn" class="btn">ORDER</button>
+        <script src="https://js.stripe.com/v3/"></script>
+        <script>
+            var stripe = Stripe('<YOUR STRIPE PUBLIC KEY>');
+            var orderBtn = document.getElementById('order-btn');
+            orderBtn.addEventListener('click', function() {
+                stripe.redirectToCheckout({
+                    sessionId: '<%= sessionId %>'
+                });
+            });
+        </script>
+        The difference to the previous approach is, that you will be redirected to a different page where payment details have to be entered.
+
+        However, this is not all that needs to be changed - instead, we now need to work in /controllers/shop.js file:
+
+        Make sure getCheckout looks like this:
+
+        exports.getCheckout = (req, res, next) => {
+        let products; // THIS WAS MOVED - had to put it here, to make it accessible by all then() blocks.
+        let total = 0; // THIS WAS MOVED - had to put it here, to make it accessible by all then() blocks.
+        req.user
+            .populate('cart.items.productId')
+            .execPopulate()
+            .then(user => {
+            products = user.cart.items;
+            products.forEach(p => {
+                total += p.quantity * p.productId.price;
+            });
+            return stripe.checkout.sessions.create({ // THIS WAS ADDED - configures a Stripe session
+                payment_method_types: ['card'],
+                line_items: products.map(p => {
+                return {
+                    name: p.productId.title,
+                    description: p.productId.description,
+                    amount: p.productId.price * 100,
+                    currency: 'usd',
+                    quantity: p.quantity
+                };
+                }),
+                success_url: 'http://localhost:3000/checkout/success', // THIS WAS ADDED
+                cancel_url: 'http://localhost:3000/checkout/cancel' // THIS WAS ADDED
+            });
+            })
+            .then(session => {
+            console.log(session);
+            res.render('shop/checkout', {
+                path: '/checkout',
+                pageTitle: 'Checkout',
+                products: products,
+                totalSum: total,
+                sessionId: session.id // THIS WAS ADDED - we need that in the checkout.ejs file (see above)
+            });
+            })
+            .catch(err => {
+            const error = new Error(err);
+            error.httpStatusCode = 500;
+            return next(error);
+            });
+        };
+
+        In this updated snippet, the biggest change is that a Stripe session is created (via stripe.checkout.sessions.create()). This session configures some essential details which are required by the code we added to checkout.ejs - Stripe needs that setup to be able to handle the payment correctly.
+
+        Important: For this to work, you need the latest version of the Stripe SDK => npm install --save stripe@latest.
+
+        Notice success_url and cancel_url? These are the pages Stripe redirects the user to. We need to make sure we provide routes for these pages!
+
+        So onwards to /routes/shop.js:
+
+        Add these two routes (anywhere in the file):
+
+        router.get('/checkout/success', shopController.getCheckoutSuccess);
+        
+        router.get('/checkout/cancel', shopController.getCheckout);
+        The getCheckout handler already exists in the shopController, so no work is needed regarding that. But we need to work on getCheckoutSuccess - so back to /controllers/shop.js!
+
+        exports.getCheckoutSuccess = (req, res, next) => {
+        let totalSum = 0;
+        req.user
+            .populate('cart.items.productId')
+            .execPopulate()
+            .then(user => {
+            user.cart.items.forEach(p => {
+                totalSum += p.quantity * p.productId.price;
+            });
+        
+            const products = user.cart.items.map(i => {
+                return { quantity: i.quantity, product: { ...i.productId._doc } };
+            });
+            const order = new Order({
+                user: {
+                email: req.user.email,
+                userId: req.user
+                },
+                products: products
+            });
+            return order.save();
+            })
+            .then(() => {
+            return req.user.clearCart();
+            })
+            .then(() => {
+            res.redirect('/orders');
+            })
+            .catch(err => {
+            const error = new Error(err);
+            console.log(err);
+            error.httpStatusCode = 500;
+            return next(error);
+            });
+        };
+
+        This handler essentially holds the same logic we also had in postOrder - main differences: We don't extract the Strip token from the incoming request and we don't create the Stripe payment in this function anymore. Why? Because Stripe already did all of that on the external page we temporarily were redirected to (during the payment process).
+
+        The only thing we therefore do in this function is that we clear the cart and store the order in our database.
+
+        Very important: Users could simply enter localhost:3000/checkout/success and reach that page without going through the payment process!
+
+        Check this page for more details: https://stripe.com/docs/payments/checkout/fulfillment
+
+        To work around that, you should either validate any orders in the database with the orders you find in the Stripe dashboard (only orders on Stripe are paid orders!) OR you go for a more sophisticated solution where you work with a webhooks (a URL Stripe can send a request to once a payment succeeded). The latter won't be trivial to test because you can't use your localhost server for that - Strip won't be able to reach that with its own requests.
+
+        Recursos de esta clase
+        03-payments-updated.zip
+    
+    357 - Useful Resources & Links
+            Attached, you find the source code for this section.
+
+            When using my source code, make sure to run npm install in the extracted folder!
+
+            Useful resources:
+
+            Official Stripe.js Docs: https://stripe.com/docs
+
+            Recursos de esta clase
+            01-added-checkout-page.zip
+            02-using-stripe.zip
+
 ------------------------------------------------------------------
 
 # Working with REST APIs - The Basics
@@ -2920,11 +3292,11 @@
 
 # Sección 27 - Understanding Websockets & Socket.io
 
-    402 - Module Introduction
+    404 - Module Introduction
         Porque usar realtime.
         Como agregar comunicacíón real a mi aplicación de Node.
 
-    403 - What Are Websockets & Why Would You Use Them?
+    405 - What Are Websockets & Why Would You Use Them?
         
         Cliente -> 1 Request ->   Servidor
                 <- 2 Response <-----
@@ -2934,10 +3306,10 @@
         Cliente -> 1 Send Data ->   Servidor
                 <- 2 Push Data  <-----
 
-    404 - Websocket Solutions - An Overview
+    406 - Websocket Solutions - An Overview
         Socket.io
 
-    405 - Setting Up Socket.io on the Server
+    407 - Setting Up Socket.io on the Server
         
         npm install --save socket.io
 
@@ -2948,7 +3320,7 @@
             console.log('Cliente conectado');
         });
 
-    406 - Establishing a Connection From the Client
+    408 - Establishing a Connection From the Client
         
         npm install --save socket.io-client
         
@@ -2959,15 +3331,34 @@
 
         * Ver bien esto porque lo esta haciendo sobre una aplicación react que no se de donde salió.
         
-    407 - Identifying Realtime Potential
-    408 - Sharing the IO Instance Across Files
-    409 - Synchronizing POST Additions
-    500 - Fixing a Bug - The Missing Username
-    501 - Updating Posts On All Connected Clients
-    502 - Sorting Correctly
-    503 - Deleting Posts Across Clients
-    504 - Wrap Up
-    505 - Useful Resources & Links
+    409 - Identifying Realtime Potential
+    410 - Sharing the IO Instance Across Files
+    411 - Synchronizing POST Additions
+    412 - Fixing a Bug - The Missing Username
+    413 - Updating Posts On All Connected Clients
+    414 - Sorting Correctly
+    415 - Deleting Posts Across Clients
+    416 - Wrap Up
+    417 - Useful Resources & Links
+            Attached, you find the source code for this section.
+
+            When using my source code, make sure to run npm install in the extracted folder!
+
+            Useful resources:
+
+            Socket.io Official Docs: https://socket.io/get-started/chat/
+
+            Alternative Websocket Library: https://www.npmjs.com/package/express-ws
+
+            Recursos de esta clase
+            01-backend-establishing-a-connection-from-the-client.zip
+            01-frontend-establishing-a-connection-from-the-client.zip
+            02-backend-synchronizing-post-additions.zip
+            02-frontend-synchronizing-post-additions.zip
+            03-backend-updating-posts-on-all-connected-clients.zip
+            03-frontend-updating-posts-on-all-connected-clients.zip
+            04-backend-deleting-posts-across-clients.zip
+            04-frontend-deleting-posts-across-clients.zip
 
 ------------------------------------------------------------------
 
