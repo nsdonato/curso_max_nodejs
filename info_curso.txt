@@ -2932,36 +2932,318 @@
     207 - Module Introduction
         Es un ODM para MongoDB como Sequelize para SQL
     208 - What is Mongoose?
-        ODM
-        Object Document Mapping Library.
-        Los conceptos centrales son que trabajamos con esquemas y modelos donde definimos cómo deberían ser nuestros datos y luego tenemos las llamadas instancias donde instanciamos nuestros modelos,
+       
+        ODM:
+            Object Document Mapping Library.
+
+        Los conceptos centrales son que trabajamos con esquemas y modelos donde definimos cómo deberían ser nuestros datos y luego tenemos las llamadas instancias donde instanciamos nuestros modelos.
 
         Entonces, cuando creamos objetos javascript reales con los que podemos trabajar que se basan en nuestros planos
-
-        y una vez que tenemos esa configuración, podemos ejecutar consultas y allí nuevamente usamos nuestros objetos, usamos nuestros modelos
-
-        y luego podemos consultar la base de datos
+        y una vez que tenemos esa configuración, podemos ejecutar consultas y allí nuevamente usamos nuestros objetos, usamos nuestros modelos  y luego podemos consultar la base de datos
 
     209 - Connecting to the MongoDB Server with Mongoose
+            https://mongoosejs.com/docs/
+            Actualice toda la carpeta de mongoose, con lo que había de recursos en la 225.
+            Tenemos que importar mongoose:
+            
+            Instalamos mongoose: 
+                npm install --save mongoose
+            
+            Elimina el archivo database.js
+            Importa mongoose:
+                const mongoose = require('mongoose');
+            
+            abajo de todo:
+            mongoose
+            .connect(
+                'mongodb+srv://maximilian:9u4biljMQc4jjqbe@cluster0-ntrwp.mongodb.net/shop?retryWrites=true'
+            )
+            .then(result => {
+                User.findOne().then(user => {
+                if (!user) {
+                    const user = new User({
+                    name: 'Max',
+                    email: 'max@test.com',
+                    cart: {
+                        items: []
+                    }
+                    });
+                    user.save();
+                }
+                });
+                app.listen(3000);
+            })
+            .catch(err => {
+                console.log(err);
+            });
+
+        Empieza a comentar todo lo que estaba con mongo de a poco y empieza a pasar todo a la manera de mongoose.
+            rutas, etc..
+            con los modelos los comenta todos.
+
     210 - Creating the Product Schema
-    211 - Saving Data Through Mongoose
-    212 - Fetching All Products
-    213 - Fetching a Single Product
-    214 - Updating Products
-    215 - Deleting Products
-    216 - Adding and Using a User Model
-    217 - Using Relations in Mongoose
-    218 - One Important Thing About Fetching Relations
-    219 - Working on the Shopping Cart
-    220 - Loading the Cart
-    221 - Deleting Cart Items
-    222 - Creating & Getting Orders
-    223 - 220 - Storing All Order Related Data
-    224 - Clearing the Cart After Storing an Order
-    225 - Getting & Displaying the Orders
-    226 - Wrap Up
-    227 - Useful Resources & Links
+
+        Elimina las base de datos que estan en compoose.
+        Empieza a escribir info en el modelo product.js
+            Define el equema de Product, o sea que tipo de dato va a ser cada propiedad, si es requerido o no.
         
+    211 - Saving Data Through Mongoose
+    
+        Exporta el esquema Product, pero en mongoose se asocia a un modelo.
+            module.exports = mongoose.model('Product', productSchema);
+
+        controller/admin
+            A diferencia de mongodb, solamente hay que cambiar la parte del contructor del producto, 
+            destructuramos el modelo, para crear un nuevo producto. (postAddProduct)
+                const product = new Product({
+                    title: title,
+                    price: price,
+                    description: description,
+                    imageUrl: imageUrl,
+                    userId: req.user
+                });
+        
+        Descomenta la ruta de agregar productos.
+        Agrega un producto.
+        Verifica que funciona en la consola de node.
+        Verifica en compoose que se creo el producto.
+
+    212 - Fetching All Products
+    
+        Mongoose no nos da un cursor, nos da los productos.
+        En vez de usar fetchAll usamos find, findById, no findByPk eh.
+
+    213 - Fetching a Single Product
+    
+        modifica la función para que use findById
+        Product.findById(prodId)
+
+    214 - Updating Products
+    
+        Va ajustando el código, viendo las rutas que comento, cambiando fetchAll por find()
+        en postEditProduct, en vez de crear un nuevo producto, busca el producto by id, y en then
+        en el objeto que obtiene empieza a reemplazar cada propiedad por lo que se actualizo y después hace product.save();
+
+    215 - Deleting Products
+
+        Cambia deleteById por  Product.findByIdAndRemove(prodId)
+
+    216 - Adding and Using a User Model
+    
+        const mongoose = require('mongoose');
+        const Schema = mongoose.Schema;
+        const userSchema = new Schema({ // OJO CON ESTE ESQUEMA QUE USA UNA COLECCIÓN EMBEBIDA ADENTRO, VER BIEN COMO ES.
+            name: {
+                type: String,
+                required: true
+            },
+            email: {
+                type: String,
+                required: true
+            },
+            cart: {
+                items: [
+                    {
+                        productId: {
+                        type: Schema.Types.ObjectId,
+                        ref: 'Product',
+                        required: true
+                        },
+                        quantity: { type: Number, required: true }
+                    }
+                ]
+            }
+        });
+
+        APP.JS  
+            Modifica la parte de la conección para que si no existe un usuario cree uno por defecto.
+
+            // descomenta esto y pone el id que se creo 
+            app.use((req, res, next) => {
+                 User.findById('5bab316ce0a7c75f783cb8a8')
+                .then(user => {
+                req.user = user;
+                next();
+                })
+                .catch(err => console.log(err));
+            });
+
+
+    217 - Using Relations in Mongoose
+    
+        Agrega a Product a el usuario, porque están relacionados.., 
+        en ref: 'User' usamos el nombre del modelo que creamos anteriormente.
+        Actualiza en usuario también la referncia a product, ref: 'Product'
+
+        en postAddProduct, agrega el usuario en la destructuración, pero tenemos que tener en cuenta que eso vien del requets.
+
+    218 - One Important Thing About Fetching Relations
+    
+        Para poder traer información de un modelo relacionado, una vez que hacemos find(), tenemos que usar 
+        populate('userId') y agregar lo que queremos traernos.
+
+        Si verificamos al traernos los productos, también vamos a tener la información del usuario.
+
+        Lo que podemos hacer también es especificar que es solamente lo que necesitamos:
+        // .select('title price -_id')
+        // .populate('userId', 'name')
+
+    219 - Working on the Shopping Cart
+
+        Acomoda lo que tenía antes y esta comentado a mongoose:
+
+        userSchema.methods.addToCart = function(product) {
+            const cartProductIndex = this.cart.items.findIndex(cp => {
+                return cp.productId.toString() === product._id.toString();
+            });
+            let newQuantity = 1;
+            const updatedCartItems = [...this.cart.items];
+
+            if (cartProductIndex >= 0) {
+                newQuantity = this.cart.items[cartProductIndex].quantity + 1;
+                updatedCartItems[cartProductIndex].quantity = newQuantity;
+            } else {
+                updatedCartItems.push({
+                productId: product._id,
+                quantity: newQuantity
+                });
+            }
+            const updatedCart = {
+                items: updatedCartItems
+            };
+            this.cart = updatedCart;
+            return this.save();
+        };
+
+        descomenta la ruta necesaria..
+
+    220 - Loading the Cart
+    
+        getCart()
+            .execPopulate() // como populate recibe no retorna una promesa, tenemos que usar esto para poder usar then,veer bien prque
+
+    221 - Deleting Cart Items
+    
+        userSchema.methods.removeFromCart = function(productId) {
+            const updatedCartItems = this.cart.items.filter(item => {
+                return item.productId.toString() !== productId.toString();
+            });
+            this.cart.items = updatedCartItems;
+            return this.save();
+        };
+
+        descomenta la ruta necesaria:
+
+        controllers/shop.js
+            exports.postCartDeleteProduct = (req, res, next) => {
+            const prodId = req.body.productId;
+            req.user
+                .removeFromCart(prodId) // cambia esto.
+                .then(result => {
+                res.redirect('/cart');
+                })
+                .catch(err => console.log(err));
+            };
+
+    222 - Creating & Getting Orders
+    
+        descomenta las rutas necesarias.
+
+        controllers/shop
+            importa el modelo de order.
+
+            exports.postOrder = (req, res, next) => {
+                req.user
+                    .populate('cart.items.productId')
+                    .execPopulate()
+                    .then(user => {
+                    const products = user.cart.items.map(i => {
+                        return { quantity: i.quantity, product: { ...i.productId._doc } };
+                    });
+                    const order = new Order({
+                        user: {
+                        name: req.user.name,
+                        userId: req.user
+                        },
+                        products: products
+                    });
+                    return order.save();
+                    })
+                    .then(result => {
+                    return req.user.clearCart();
+                    })
+                    .then(() => {
+                    res.redirect('/orders');
+                    })
+                    .catch(err => console.log(err));
+                };
+
+
+        crea el modelo de order.
+
+
+    223 - Storing All Order Related Data
+
+        agrega esto a lo anterior (que yo ya lo había pegado completo)
+            return { quantity: i.quantity, product: { ...i.productId._doc } }; // _doc es lo que agrega y ofrece mongoose
+
+    224 - Clearing the Cart After Storing an Order
+    
+        userSchema.methods.clearCart = function() {
+            this.cart = { items: [] };
+            return this.save();
+        };
+
+        controllers/shop
+         en postProduct, agrega:
+
+         .then(result => {
+            return req.user.clearCart();
+         })
+
+    225 - Getting & Displaying the Orders
+    
+        Controllers/shop.js - Modifica:
+
+        exports.getOrders = (req, res, next) => {
+        Order.find({ 'user.userId': req.user._id })
+            .then(orders => {
+            res.render('shop/orders', {
+                path: '/orders',
+                pageTitle: 'Your Orders',
+                orders: orders
+            });
+            })
+            .catch(err => console.log(err));
+        };
+
+        descomenta la ruta necesaria
+        acomoda la vista orders.ejs
+
+    226 - Wrap Up
+        
+        Un resumen de lo que vimos en el modulo. Todo depende de que queres hacer en tu app para elegir sql o nosql
+
+    227 - Useful Resources & Links
+        Useful Resources & Links
+        Attached, you find the source code for this section.
+
+        When using my source code, make sure to run npm install in the extracted folder!
+
+        Useful resource:
+
+        Mongoose Official Docs: https://mongoosejs.com/docs/
+
+        Recursos de esta clase
+        01-connecting-to-the-mongodb-server.zip
+        02-saving-data-through-mongoose.zip
+        03-fetching-all-products.zip
+        04-deleting-products.zip
+        05-adding-and-using-a-user-model.zip
+        06-using-relations-in-mongoose.zip
+        07-working-on-the-shopping-cart.zip
+        08-loading-the-cart.zip
+        09-getting-and-displaying-orders.zip
 ------------------------------------------------------------------
 
 # Sección 14 - Sessions & Cookies
