@@ -2531,27 +2531,363 @@
         poner el user, pass y conectar.
 
     184 - Fetching All Products
-        models/products
+          
+          models/products
             
+            static fetchAll() {
+                const db = getDb();
+                return db
+                    .collection('products')
+                    .find()       // find devuelve un cursor.
+                    .toArray()    // convertirlos en una matrz. usar SOLO SI SABEMOS QUE HAY POCOS DATOS, SINO PAGINAR.
+                    .then(products => {
+                        console.log(products);
+                        return products;
+                    })
+                    .catch(err => {
+                        console.log(err);
+                    });
+                }
+            }
+
+        controllers/shop:
+            exports.getProducts = (req, res, next) => {
+                Product.fetchAll()
+                .then(products => {
+                res.render('shop/product-list', {
+                    prods: products,
+                    pageTitle: 'All Products',
+                    path: '/products'
+                });
+                })
+                .catch(err => {
+                console.log(err);
+                });
+            };
+
+            exports.getIndex = (req, res, next) => {
+            Product.fetchAll()
+                .then(products => {
+                res.render('shop/index', {
+                    prods: products,
+                    pageTitle: 'Shop',
+                    path: '/'
+                });
+                })
+                .catch(err => {
+                console.log(err);
+                });
+            };
+
     185 - Fetching a Single Product
+            
+        models/product.js
+            static findById(prodId) {
+                const db = getDb();
+                return db
+                .collection('products')
+                .find({ _id: new mongodb.ObjectId(prodId) }) //  find, trae un cursor, así que usamos next, para que busque en cada collección, el producto que quiero.
+                .next()
+                .then(product => {
+                    console.log(product);
+                    return product;
+                })
+                .catch(err => {
+                    console.log(err);
+                });
+            }
+
+        - En las vistas que uso el id del producto, necesito usar: product._id porque así es para mongo.
+        - Como en MongoDB, se almacena en BSON, tenemos que usar _id: new mongodb.ObjectId(prodId) para encontrar el id     especifico.
+        
+
     186 - Making the "Edit" & "Delete" Buttons Work Again
+        
+        vuelve a poner código que había comentado.
+
     187 - Working on the Product Model to Edit our Product
+
+        Descomenta código, verifica que los products._id esten así y no .id
+        Agrega el id al contructor de Product, para poder hacer los update.
+        Actualiza la función Save, para que si el producto es el qe esta instanciado, se updatee y sino que inserte uno en la base.
+
+        .updateOne({ _id: new mongodb.ObjectId(this._id) }, { $set: this }); // $set le pasamos this, para que actualice en el documento que encuentre en la base con los nuevos valores.
+
     188 - Finishing the "Update Product" Code
+
+        Actualiza la función:
+            exports.postEditProduct = (req, res, next) => {
+            const prodId = req.body.productId;
+            const updatedTitle = req.body.title;
+            const updatedPrice = req.body.price;
+            const updatedImageUrl = req.body.imageUrl;
+            const updatedDesc = req.body.description;
+
+            const product = new Product(
+                updatedTitle,
+                updatedPrice,
+                updatedDesc,
+                updatedImageUrl,
+                new ObjectId(prodId)
+            );
+            product
+                .save()
+                .then(result => {
+                    console.log('UPDATED PRODUCT!');
+                    res.redirect('/admin/products');
+                })
+                .catch(err => console.log(err));
+            };  
+
     189 - One Note About Updating Products
+
+        Mejora la parte del código donde agrego el this._id 
+
+         this._id = new mongodb.ObjectId(id);
+         y
+         .updateOne({ _id: this._id }, { $set: this });
+
     190 - Deleting Products
+
+        .deleteOne({ _id: new mongodb.ObjectId(prodId) })
+
+        // descomenta: 
+        router.post('/delete-product', adminController.postDeleteProduct);
+
     191 - Fixing the "Add Product" Functionality
+        
+        Arregla esto en el contructor del producto.
+            this._id = id ? new mongodb.ObjectId(id) : null;
+
     192 - Creating New Users
+
+            Crea la clase User:
+                Crea el metodo save.
+                Crea el metodo findById
+
+            app.js  
+                const User = require('./models/user');
+            
+                // actualiza esto:
+                app.use((req, res, next) => {
+                User.findById('5baa2528563f16379fc8a610')
+                    .then(user => {
+                    req.user = new User(user.name, user.email, user.cart, user._id);
+                    next();
+                    })
+                    .catch(err => console.log(err));
+                });
+
     193 - Storing the User in our Database
+
+        Agrega al constructor del producto:
+            this.userId = userId;
+        
+
     194 - Working on Cart Items & Orders
+
+        models/user.js
+            class User {
+                constructor(username, email, cart, id) {
+                this.name = username;
+                this.email = email;
+                this.cart = cart; // {items: []}
+                this._id = id;
+            }
+        
+            addToCart(product) {
+                const cartProductIndex = this.cart.items.findIndex(cp => {
+                    return cp.productId.toString() === product._id.toString();
+                });
+
+                let newQuantity = 1;
+                const updatedCartItems = [...this.cart.items];
+
+                if (cartProductIndex >= 0) {
+                    newQuantity = this.cart.items[cartProductIndex].quantity + 1;
+                    updatedCartItems[cartProductIndex].quantity = newQuantity;
+                } else {
+                    updatedCartItems.push({
+                        productId: new ObjectId(product._id),
+                        quantity: newQuantity
+                });
+                }
+                const updatedCart = {
+                    items: updatedCartItems
+                };
+                const db = getDb();
+                return db
+                .collection('users')
+                .updateOne(
+                    { _id: new ObjectId(this._id) },
+                    { $set: { cart: updatedCart } }
+                );
+            }
+
     195 - Adding the "Add to Cart" Functionality
+        
+        app.js:
+            req.user = new User(user.name, user.email, user.cart, user._id);
+
+        exports.postCart = (req, res, next) => {
+        const prodId = req.body.productId;
+        Product.findById(prodId)
+            .then(product => {
+            return req.user.addToCart(product);
+            })
+            .then(result => {
+            console.log(result);
+            res.redirect('/cart');
+            });
+        };
+
+        routes, descomenta:
+            router.post('/cart', shopController.postCart);
+        
+        actualiza vistas.
+
+        ** ver de ser necesario, muestra como hay una colección de usuarios que adentro tiene una de cart.
+
     196 - Storing Multiple Products in the Cart
+
+        Hace modificaciones a addToCart();
+
     197 - Displaying the Cart Items
+
+     models/user:
+        getCart() {
+                const db = getDb();
+                const productIds = this.cart.items.map(i => {
+                return i.productId;
+                });
+                return db
+                .collection('products')
+                .find({ _id: { $in: productIds } })
+                .toArray()
+                .then(products => {
+                    return products.map(p => {
+                    return {
+                        ...p,
+                        quantity: this.cart.items.find(i => {
+                        return i.productId.toString() === p._id.toString();
+                        }).quantity
+                    };
+                    });
+                });
+        }
+
+        controller/shop:
+            exports.getCart = (req, res, next) => {
+            req.user
+                .getCart()
+                .then(products => {
+                res.render('shop/cart', {
+                    path: '/cart',
+                    pageTitle: 'Your Cart',
+                    products: products
+                });
+                })
+                .catch(err => console.log(err));
+            };
+
     198 - Fixing a Bug
+
+        en postCart, falto un redirect a /cart
+
     199 - Deleting Cart Items
+    
+        controller/shop:
+            exports.postCartDeleteProduct = (req, res, next) => {
+            const prodId = req.body.productId;
+            req.user
+                .deleteItemFromCart(prodId)
+                .then(result => {
+                res.redirect('/cart');
+                })
+                .catch(err => console.log(err));
+            };
+
+        model/user:
+            deleteItemFromCart(productId) {
+            const updatedCartItems = this.cart.items.filter(item => {
+                return item.productId.toString() !== productId.toString();
+            });
+            const db = getDb();
+            return db
+            .collection('users')
+            .updateOne(
+                { _id: new ObjectId(this._id) },
+                { $set: { cart: { items: updatedCartItems } } }
+            );
+        }
+        
     200 - Adding an Order
+
+        model/user:
+            addOrder() {
+                const db = getDb();
+                return this.getCart()
+                .then(products => {
+                    const order = {
+                    items: products,
+                    user: {
+                        _id: new ObjectId(this._id),
+                        name: this.name
+                    }
+                    };
+                    return db.collection('orders').insertOne(order);
+                })
+                .then(result => {
+                    this.cart = { items: [] };
+                    return db
+                    .collection('users')
+                    .updateOne(
+                        { _id: new ObjectId(this._id) },
+                        { $set: { cart: { items: [] } } }
+                    );
+                });
+            }
+
+        controller/shop:
+            exports.postOrder = (req, res, next) => {
+            let fetchedCart;
+            req.user
+                .addOrder()
+                .then(result => {
+                res.redirect('/orders');
+                })
+                .catch(err => console.log(err));
+            };
+  
+    
     201 - Adding Relational Order Data
+
+        controller/shop:
+            exports.getOrders = (req, res, next) => {
+            req.user
+                .getOrders()
+                .then(orders => {
+                res.render('shop/orders', {
+                    path: '/orders',
+                    pageTitle: 'Your Orders',
+                    orders: orders
+                });
+                })
+                .catch(err => console.log(err));
+            };
+
+        arregla algo de addOrder();
+
+        models
+
     202 - Getting Orders
+    
+        actualiza la función getOrders (antes la copie completa.)
+
     203 - Removing Deleted Items From the Cart
+
+        Como hizo un par de cambios, borro cosas de la base a mano para que quede todo ok.
+
     204 - Wrap Up
         Resumen de todo..
     205 - Useful Resources & Links
@@ -2593,9 +2929,9 @@
 
 # Sección 13 - Working with Mongoose
 
-    Module Introduction
+    207 - Module Introduction
         Es un ODM para MongoDB como Sequelize para SQL
-    What is Mongoose?
+    208 - What is Mongoose?
         ODM
         Object Document Mapping Library.
         Los conceptos centrales son que trabajamos con esquemas y modelos donde definimos cómo deberían ser nuestros datos y luego tenemos las llamadas instancias donde instanciamos nuestros modelos,
@@ -2606,26 +2942,26 @@
 
         y luego podemos consultar la base de datos
 
-    Connecting to the MongoDB Server with Mongoose
-    Creating the Product Schema
-    Saving Data Through Mongoose
-    Fetching All Products
-    Fetching a Single Product
-    Updating Products
-    Deleting Products
-    Adding and Using a User Model
-    Using Relations in Mongoose
-    One Important Thing About Fetching Relations
-    Working on the Shopping Cart
-    Loading the Cart
-    Deleting Cart Items
-    Creating & Getting Orders
-    Storing All Order Related Data
-    Clearing the Cart After Storing an Order
-    Getting & Displaying the Orders
-    Wrap Up
-    Useful Resources & Links
-
+    209 - Connecting to the MongoDB Server with Mongoose
+    210 - Creating the Product Schema
+    211 - Saving Data Through Mongoose
+    212 - Fetching All Products
+    213 - Fetching a Single Product
+    214 - Updating Products
+    215 - Deleting Products
+    216 - Adding and Using a User Model
+    217 - Using Relations in Mongoose
+    218 - One Important Thing About Fetching Relations
+    219 - Working on the Shopping Cart
+    220 - Loading the Cart
+    221 - Deleting Cart Items
+    222 - Creating & Getting Orders
+    223 - 220 - Storing All Order Related Data
+    224 - Clearing the Cart After Storing an Order
+    225 - Getting & Displaying the Orders
+    226 - Wrap Up
+    227 - Useful Resources & Links
+        
 ------------------------------------------------------------------
 
 # Sección 14 - Sessions & Cookies
@@ -2636,14 +2972,12 @@
     229 - What is a Cookie?
         
         Por ejemplo, cuando el usuario se quiere loguear, guardamos cierta información del login, para que la proxima vez que haga un request, nosotros tengamos la información de que el usuario esta autenticado.
-
-        Para eso, desde node, podemos enviar una cookie por header.
-
-        Las cookies se guardan del lado del cliente.
+        - Para eso, desde node, podemos enviar una cookie por header.
+        - Las cookies se guardan del lado del cliente.
 
     230 - The Current Project Status
 
-        // A el, el proyecto le con Mongoose, dice que hay que bajar las cosas pero quiero fucking avanzar.
+        Le quedó el proyecto con Mongoose. Voy a escribir teoria nada mas, quiero avanzar.
 
     231 - Optional: Creating the Login Form
         
@@ -2660,16 +2994,38 @@
     238 - Using the Session Middleware
     239 - Using MongoDB to Store Sessions
     240 - Sessions & Cookies - A Short Summary
-    241 - Time to Practice - Sessions and Cookies 
-    242 - 1 pregunta
-    243 - Deleting a Cookie
-    244 - Fixing Some Minor Bugs
-    245 - Making "Add to Cart" Work Again
-    246 - Two Tiny Improvements
-    247 - Wrap Up
-    248 - Code Adjustments
-    249 - Useful Resources & Links
+          Time to Practice - Sessions and Cookies  - 1 pregunta
+    241 - Deleting a Cookie
+    242 - Fixing Some Minor Bugs
+    243 - Making "Add to Cart" Work Again
+    244 - Two Tiny Improvements
+    245 - Wrap Up
+    246 - Code Adjustments
+    247 - Useful Resources & Links
+        Useful Resources & Links
+        Attached, you find the source code for this section.
 
+        When using my source code, make sure to run npm install in the extracted folder!
+
+        Useful resource:
+
+        More on Sessions: https://www.quora.com/What-is-a-session-in-a-Web-Application
+
+        More on Cookies: https://developer.mozilla.org/en-US/docs/Web/HTTP/Cookies
+
+        Express-session Official Docs: https://github.com/expressjs/session
+
+        Recursos de esta clase
+        00-starting-setup.zip
+        01-creating-the-login-form.zip
+        02-adding-the-request-driven-solution.zip
+        03-configuring-cookies.zip
+        04-using-the-session-middleware.zip
+        05-using-mongodb-session-store.zip
+        06-deleting-a-cookie.zip
+        07-fixing-some-minor-bugs.zip
+        08-two-tiny-improvements.zip
+        assignment-solution.zip
 ------------------------------------------------------------------
 
 # Sección 15 - Adding Authentication
@@ -3505,10 +3861,9 @@
 
         Last but not least - I tweet on @maxedapps and on @academind_real, would love to see you there!
 
--------------------- IDEAS BELGA ---------------------------------
+# IDEAS BELGA ---------------------------------
 
-
-Verificar si no hay next demas
-Verificar que las rutas vayan de la mas importante a la menos, salvo que se le ponga next
-Poner las rutas en carpetas diferentes, todo, así queda mas limpio la app
-Agregar una pagina de error personalizado.
+    Verificar si no hay next demas
+    Verificar que las rutas vayan de la mas importante a la menos, salvo que se le ponga next
+    Poner las rutas en carpetas diferentes, todo, así queda mas limpio la app
+    Agregar una pagina de error personalizado.
