@@ -3259,7 +3259,7 @@
 
     230 - The Current Project Status
 
-        Le quedó el proyecto con Mongoose. Voy a escribir teoria nada mas, quiero avanzar.
+       Cree la carpeta mongoose cookies y meti todo lo que estaba en el 246, elimne todo lo de la base para hacer esto.
 
     231 - Optional: Creating the Login Form
         
@@ -3268,9 +3268,30 @@
         - genera el controlador auth.js
 
     232 - Adding the Request Driven Login Solution
+             
+        Agrega a todos los endpoints, que el usuario esta autenticado.
+             isAuthenticated: req.session.isLoggedIn
+
+        Una vez que hacemos redirect, perdemos la info de la persona logueada, así que en el prox vamos a ver como solucinamos esto.
+        
     233 - Setting a Cookie
+
+        Vamos a guardar información del usuario en el navegador, para tener cierta información aparte de que el usuario esta logueado.
+
+        res.setHeader('Set-Cookie', 'loggedIn=true');
+        Developer Tools > Parte de Cookies: ahí va a estar loggedIn = true.
+        De esta manera podemos ver nuestra cookie: console.log( req.get('Cookie').split(';')[1].trim().split('=')[1] );
+
     234 - Manipulating Cookies
+
+        const isLoggein = req.get('Cookie').split(';')[1].trim().split('=')[1] === 'true';
+        No queremos que cualquiera manipule las cookies.
+        Las cookies no son ideales en todos los escenarios.
+
     235 - Configuring Cookies
+    
+        
+    
     236 - What is a Session?
     237 - Initializing the Session Middleware
     238 - Using the Session Middleware
